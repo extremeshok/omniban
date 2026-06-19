@@ -58,8 +58,9 @@ full CLI (`status`/`doctor`/`list`/`check`/`ban`/`unban`/`allow`/`unallow`/
 `sinkhole`/`null-route`/`apply-routes`/`undo`/`init`/`version`); the Bubble Tea
 TUI; and the goreleaser/nfpm release pipeline.
 
-Remaining before tagging v1.0.0: run the poll-ci gate on the CI VPS and the live
-per-distro e2e (the maintainer is providing a VPS). See `TODO.md` for follow-ups.
+Released as **v1.2.0** via goreleaser (static amd64/arm64 binaries, `.deb`/`.rpm`,
+and `checksums.txt`). Remaining follow-ups: the poll-ci gate on the CI VPS and the
+live per-distro e2e (AlmaLinux/CloudLinux/Proxmox). See `TODO.md`.
 
 ## Architecture
 

@@ -49,7 +49,8 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 ## M6 — Packaging/release/docs  (done, pending VPS validation)
 - [x] goreleaser + nfpm: static amd64/arm64 binaries + .deb/.rpm + checksums (snapshot verified)
 - [x] install script; release workflow; systemd unit; full docs
-- [ ] tag v1.0.0 after poll-ci on the CI VPS + live per-distro e2e
+- [x] released v1.2.0 via goreleaser (static amd64/arm64 binaries + .deb/.rpm + checksums)
+- [ ] follow-up: poll-ci gate on the CI VPS + live per-distro e2e (AlmaLinux/CloudLinux/Proxmox)
 
 ## M7 — Live container e2e for all backends  (done)
 - [x] `test/e2e/` suite + `make e2e`: real-tool e2e in privileged containers

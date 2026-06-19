@@ -2,94 +2,145 @@
 
 **One ban manager for every Linux firewall & IDS.**
 
-`omniban` is a single TUI/CLI to view, search, and manage IP bans, domain
-sinkholes, and null-routes across every firewall and intrusion-defense tool on a
-Linux server. It auto-detects what's installed, shows every ban tagged by its
-source and direction, and adds/removes/whitelists through the correct native
-backend — so you never fight your IDS or clobber another tool's rules.
+[![Release](https://img.shields.io/github/v/release/extremeshok/omniban?sort=semver)](https://github.com/extremeshok/omniban/releases)
+[![License: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
+[![Go](https://img.shields.io/badge/go-1.26-00ADD8?logo=go&logoColor=white)](go.mod)
+[![Platform](https://img.shields.io/badge/platform-linux%20amd64%20%7C%20arm64-555)](https://github.com/extremeshok/omniban/releases)
 
-> Status: all 19 backends support read/write (list/search/unban, plus ban/allow
-> where the mechanism allows), with the CLI, the interactive TUI, safety
-> (lockout guard, undo, audit, dry-run), and the CI gate in place. See
-> [`TODO.md`](TODO.md) and [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
+Stop juggling a dozen firewall and intrusion-defense tools. `omniban` is a single
+TUI **and** scriptable CLI that shows **every** IP ban, domain sinkhole, and
+null-route on a Linux box — each one tagged by the tool that owns it — and lets
+you search, add, and remove them through the **correct native backend**, so you
+never fight your IDS or clobber another tool's rules.
 
-## Why
+[**Quick Start**](#quick-start) · [Watch the demo](docs/media/omniban-demo.gif) · [Backends](#supported-backends) · [Usage](#usage) · [Safety](#safety-first)
 
-A typical server runs several overlapping ban mechanisms that each have their own
-CLI, data store, and quirks — and they layer on top of each other (an IDS creates
-a ban that is enforced inside a firewall). `omniban` unifies them behind one
-interface and one mental model.
+![omniban TUI demo](docs/media/omniban-demo.gif)
 
-## Supported backends (v1)
+## Quick Start
+
+**Install (one-liner, standalone binary):**
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/extremeshok/omniban/master/scripts/install.sh | sudo bash
+```
+
+**Or install the native package:**
+
+```sh
+# Debian / Ubuntu
+sudo apt install ./omniban_*_linux_amd64.deb
+# RHEL / AlmaLinux / Rocky / CloudLinux
+sudo dnf install ./omniban_*_linux_amd64.rpm
+```
+
+Then just run it:
+
+```sh
+sudo omniban            # interactive TUI on a terminal
+sudo omniban status     # or go straight to the CLI
+```
+
+That's it — omniban auto-detects every ban mechanism already installed. No config
+required.
+
+## Why people use it
+
+- **One view of everything.** fail2ban, CrowdSec, CSF, UFW, firewalld, nftables,
+  `/etc/hosts`, blackhole routes… all in one source- and direction-labeled list,
+  instead of ten different commands and file formats.
+- **Never fights your automation.** An IDS-created ban is removed *through the
+  IDS* — omniban won't just delete the downstream firewall rule and watch the IDS
+  re-add it five seconds later.
+- **Never clobbers another tool.** omniban writes only to its own dedicated
+  namespaces; everything else is read for attribution only, never modified.
+- **Answers "is this IP blocked anywhere?" instantly** — exact, wildcard, or
+  CIDR-containment search across every backend at once, hostname or domain too.
+- **Safe by default.** Dry-run previews, an audit trail, an undo journal, file
+  backups before every edit, and a lockout guard that refuses to ban your own SSH
+  session.
+- **One static binary.** No runtime, no daemon required, no dependencies — built
+  for Ubuntu, Debian, RHEL clones, CloudLinux, and Proxmox.
+
+## Supported backends
+
+omniban speaks each tool's native API and reads every ban back into one unified,
+deduplicated list — an IP enforced in five places shows as **one** row owned by
+its IDS, with the rest in an `ALSO` column.
 
 | Layer | Backends |
 |-------|----------|
-| IDS / detection | CrowdSec, fail2ban, sshguard, CSF/LFD, APF/BFD, denyhosts, Suricata, Wazuh/OSSEC |
-| Firewall / enforcement | UFW, firewalld, Shorewall, raw nftables, raw iptables, ipset |
-| Proxy / load balancer | HAProxy |
-| WAF | ModSecurity, BunkerWeb |
-| Routing / DNS | blackhole null-routes (`ip route`), `/etc/hosts` sinkholes |
+| **IDS / detection** | CrowdSec · fail2ban · sshguard · CSF/LFD · APF/BFD · denyhosts · Suricata · Wazuh/OSSEC |
+| **Firewall / enforcement** | UFW · firewalld · Shorewall · raw nftables · raw iptables · ipset |
+| **Proxy / load balancer** | HAProxy |
+| **WAF** | ModSecurity · BunkerWeb |
+| **Routing / DNS** | blackhole null-routes (`ip route`) · `/etc/hosts` sinkholes |
 
-Targets Ubuntu, Debian, RHEL clones (AlmaLinux/Rocky), CloudLinux, and Proxmox.
-Roadmap: FireHOL, Proxmox pve-firewall, threat-feed import.
-
-## Design principles
-
-- **Source-labeled.** Every ban shows its true owner; unbans route to that owner.
-- **Never fight the automation.** An IDS-created ban is removed via the IDS, not
-  by deleting the downstream firewall rule.
-- **Never clobber.** omniban only writes to its own dedicated namespaces; other
-  tools' sets/chains/rules are read for attribution only.
-- **Safe by default.** Dry-run previews, an audit trail, an undo journal, backups
-  before editing files, and a lockout guard that refuses to ban your own SSH IP.
-
-## Install
-
-Native package or single static binary (a firewall manager must run on the host,
-not in a container):
-
-```sh
-# Debian/Ubuntu
-sudo dpkg -i omniban_*_linux_amd64.deb
-# RHEL/AlmaLinux/Rocky/CloudLinux
-sudo rpm -i omniban_*_linux_amd64.rpm
-```
-
-Or build from source (Go 1.26+):
-
-```sh
-make build && sudo make install
-```
+**19 backends**, every one supporting list + search + unban (and ban/allow
+wherever the tool allows). Each is exercised by live, real-tool end-to-end tests
+in privileged containers, not just mocks.
 
 ## Usage
 
 ```sh
-sudo omniban status                       # detected backends and their state
+sudo omniban status                       # detected backends + their state
 sudo omniban doctor                       # health check + warnings
-sudo omniban list                         # every ban/allow, source- and direction-labeled
+sudo omniban list                         # every ban/allow, source- + direction-labeled
 sudo omniban check 1.2.3.4 --contains     # is this blocked anywhere? (incl. covering CIDRs)
 sudo omniban ban evil.example.com --duration 4h   # resolves the host, bans each address
 sudo omniban unban 1.2.3.4 --via denyhosts
+sudo omniban allow 10.0.0.5               # add to a backend allowlist
 sudo omniban sinkhole ads.example.com     # /etc/hosts domain null-route (outbound)
 sudo omniban null-route 203.0.113.0/24    # blackhole route (both directions)
 sudo omniban undo                         # roll back the last mutating action
 ```
 
-Run `sudo omniban` with no arguments (on a terminal) for the interactive TUI,
-or `sudo omniban tui`. Add `--dry-run` to any mutating command to preview the
-exact native command(s) without executing.
+Run `sudo omniban` with no arguments (on a terminal) for the interactive TUI, or
+`sudo omniban tui`. Every command takes `--json` for scripting and `--dry-run` to
+preview the exact native command(s) without executing.
+
+### The unified ban list
+
+Every ban across every tool, tagged with its true owner and direction. `AlsoSeenIn`
+shows where else the same address is enforced.
+
+![omniban bans view](docs/media/bans.png)
+
+### Backend health at a glance
+
+![omniban status view](docs/media/status.png)
+
+### Unban routes back through the owning tool
+
+Pressing `u` on an IDS-owned ban removes it *through that IDS* — not by deleting a
+firewall rule the IDS would just recreate.
+
+![omniban unban confirmation](docs/media/bans_confirm.png)
+
+## Safety first
+
+A firewall manager that runs as root has to be careful. omniban is:
+
+- **Lockout-proof.** It refuses to ban your current SSH client IP, loopback, the
+  host's own addresses, the default gateway, or your admin allowlist without an
+  explicit `--force`.
+- **Reversible.** Every mutating action is pushed to an undo journal (`omniban
+  undo`) and recorded in a sanitized JSON audit log.
+- **Non-destructive.** Files like `/etc/hosts`, `hosts.deny`, and persistence
+  configs are backed up before any edit.
+- **Honest about scope.** Foreign namespaces (`f2b-*`, `crowdsec-*`, firewalld
+  zones, the sshguard set) are read for attribution and never written.
 
 ## Updating
 
 How omniban updates depends on how it was installed:
 
-- **`.deb`/`.rpm`:** updates come from your package manager
+- **`.deb` / `.rpm`:** updates come from your package manager
   (`apt-get install --only-upgrade omniban`, `dnf upgrade omniban`). The built-in
-  self-updater is disabled for packages and points you here.
-- **Standalone binary** (the `.tar.gz` or `install.sh`): omniban can update
-  itself. The download is verified against the release `checksums.txt` (SHA-256)
-  before the running binary is atomically replaced (the old one is kept at
-  `<path>.bak`).
+  self-updater is **disabled** for packages and points you here.
+- **Standalone binary** (the `.tar.gz` or `install.sh`): omniban updates itself.
+  The download is verified against the release `checksums.txt` (SHA-256) before
+  the running binary is atomically replaced (the old one is kept at `<path>.bak`).
 
 ```sh
 sudo omniban update                  # update to the latest release
@@ -98,24 +149,30 @@ sudo omniban update --enable-timer   # opt in to automatic daily updates (system
 sudo omniban update --disable-timer  # turn automatic updates back off
 ```
 
-`update --check` exits `10` when a newer release is available (and `0` when up to
-date), so it scripts cleanly: `if ! omniban update --check; then sudo omniban update; fi`.
+`update --check` exits `10` when a newer release is available, so it scripts
+cleanly: `if ! omniban update --check; then sudo omniban update; fi`. A passive
+"newer version available" notice also appears on `omniban status` for standalone
+installs (one check per day; disable with `update_check: false` in the config or
+`OMNIBAN_NO_UPDATE_CHECK=1`).
 
-A passive "a newer version is available" notice appears on `omniban status` for
-standalone installs (throttled to one check per day; disable with
-`update_check: false` in the config or `OMNIBAN_NO_UPDATE_CHECK=1`).
+## Build from source
+
+```sh
+make build && sudo make install   # needs Go 1.26+
+```
 
 ## Development
 
 ```sh
-make all          # fmt, vet, lint, test
-make test         # go test -race
+make all            # fmt, vet, lint, test
+make test           # go test -race
 make coverage-check
-make lint         # golangci-lint
+make e2e            # live real-tool end-to-end suite (Docker, privileged)
 ```
 
-Contributor conventions — including the no-AI-attribution and no-emoji rules —
-are in [`AGENTS.md`](AGENTS.md). CI runs via [`extremeshok/poll-ci`](.poll-ci.yml).
+Contributor conventions are in [`AGENTS.md`](AGENTS.md); production criteria and
+status in [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md). CI runs
+via [`extremeshok/poll-ci`](.poll-ci.yml).
 
 ## License
 
