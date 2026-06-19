@@ -28,15 +28,18 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] CLI: `list`, `check`, `ban`, `unban`, `allow`, `unallow`, `undo` (+ `--dry-run`/`--json`)
 - [x] manager dedup/attribution + audit + undo + lockout guard
 
-## M3 — Firewall/enforcement RW
-- [ ] UFW, firewalld, raw nftables (own table), raw iptables (own chain)
-- [ ] ipset (own sets + ensure referencing rule)
-- [ ] `internal/persist`: per-distro persistence; foreign-namespace safety; AlsoSeenIn
+## M3 — Firewall/enforcement RW  (done)
+- [x] UFW (by-spec deny/allow + delete), firewalld (permanent rich rules + reload)
+- [x] raw nftables (own table `inet omniban`, deny4/deny6 sets + drop rule)
+- [x] raw iptables (own chain OMNIBAN_INPUT, v4+v6)
+- [x] ipset (own sets omniban-deny4/6 + idempotent referencing DROP rule)
+- [x] owned-namespace safety (only ever writes omniban's own objects); golden fixtures + tests
+- [ ] follow-up: foreign-enforcement scan to populate AlsoSeenIn; reboot persistence for raw nft/iptables/ipset via `omniban apply`
 
-## M4 — Routing/DNS mechanisms
-- [ ] blackhole null-route + `apply-routes` + systemd oneshot persistence
-- [ ] `/etc/hosts` sinkhole: whole-file scan, managed-block adds, surgical remove, backups
-- [ ] Direction surfaced in list/check
+## M4 — Routing/DNS mechanisms  (done)
+- [x] blackhole null-route + `apply-routes` + systemd oneshot persistence (own routes file)
+- [x] `/etc/hosts` sinkhole: whole-file scan (managed vs External), managed-block adds, surgical remove, backups
+- [x] `sinkhole` / `null-route` CLI; Direction surfaced in list/check
 
 ## M5 — TUI
 - [ ] bubbletea bans/allowlist/status views; search & action modals; filter/sort; async refresh

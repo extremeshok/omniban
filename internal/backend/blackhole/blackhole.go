@@ -12,6 +12,7 @@ import (
 	"context"
 
 	"github.com/extremeshok/omniban/internal/backend"
+	"github.com/extremeshok/omniban/internal/config"
 	"github.com/extremeshok/omniban/internal/exec"
 	"github.com/extremeshok/omniban/internal/model"
 )
@@ -20,10 +21,15 @@ import (
 type Backend struct {
 	backend.Unimplemented
 	r exec.Runner
+
+	// routesFile persists null-routes for boot replay; overridable in tests.
+	routesFile string
 }
 
 // New constructs a blackhole adapter.
-func New(r exec.Runner) *Backend { return &Backend{r: r} }
+func New(r exec.Runner) *Backend {
+	return &Backend{r: r, routesFile: config.BlackholeFile}
+}
 
 // Name returns the backend identifier.
 func (b *Backend) Name() string { return string(model.OriginBlackhole) }

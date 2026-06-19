@@ -4,8 +4,8 @@
 // Licensed under the BSD 3-Clause License.
 
 // Package firewalld adapts firewalld (the default on RHEL clones / CloudLinux).
-// omniban manages a dedicated ipset plus a rich rule, distinguishing runtime
-// from --permanent state.
+// omniban manages its bans and allows as permanent source-address rich rules so
+// they survive restarts, applying changes with firewall-cmd --reload.
 package firewalld
 
 import (

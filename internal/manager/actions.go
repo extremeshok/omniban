@@ -252,6 +252,27 @@ func (m *Manager) Undo(ctx context.Context, dryRun bool) (model.Result, error) {
 	}
 }
 
+// applier is implemented by backends that persist state for boot replay.
+type applier interface {
+	Apply(ctx context.Context) error
+}
+
+// ApplyPersisted replays every backend's persisted state (e.g. blackhole
+// routes). Used by `omniban apply-routes` at boot via the systemd oneshot.
+func (m *Manager) ApplyPersisted(ctx context.Context) error {
+	var firstErr error
+	for _, b := range m.backends {
+		ap, ok := b.(applier)
+		if !ok {
+			continue
+		}
+		if err := ap.Apply(ctx); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
+}
+
 // targetFor selects the backend for a mutation: explicit --via, else the hosts
 // sinkhole for domains, else the manual firewall target for inbound IP bans.
 func (m *Manager) targetFor(ctx context.Context, req model.ActionRequest) (backend.Backend, error) {

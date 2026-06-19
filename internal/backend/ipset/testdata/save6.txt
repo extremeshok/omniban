@@ -1,0 +1,3 @@
+create omniban-deny6 hash:net family inet6
+add omniban-deny6 2001:db8::1
+add omniban-deny6 2001:db8:abcd::/48

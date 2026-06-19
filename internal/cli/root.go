@@ -82,6 +82,9 @@ func (a *app) rootCmd() *cobra.Command {
 		a.unbanCmd(),
 		a.allowCmd(),
 		a.unallowCmd(),
+		a.sinkholeCmd(),
+		a.nullRouteCmd(),
+		a.applyRoutesCmd(),
 		a.undoCmd(),
 	)
 	return root
