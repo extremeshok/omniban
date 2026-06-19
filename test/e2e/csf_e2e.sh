@@ -3,15 +3,27 @@
 set -u
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq >/dev/null 2>&1
-apt-get install -y -qq perl wget ca-certificates libwww-perl libio-socket-ssl-perl iptables >/dev/null 2>&1 \
+# cron provides /etc/crontab, which CSF reads on most operations (it manages a
+# TESTING auto-disable cron); without it csf dies mid-command in a slim image.
+apt-get install -y -qq curl perl ca-certificates libwww-perl libio-socket-ssl-perl iptables cron >/dev/null 2>&1 \
   || { echo "SKIP: prereqs failed"; exit 0; }
 cd /usr/src || exit 0
-wget -q https://download.configserver.com/csf.tgz || { echo "SKIP: csf download failed"; exit 0; }
+# CSF_TGZ can point at any assembled csf.tgz. The official host
+# (download.configserver.com) is unreachable in some sandboxes, so default to an
+# assembled release tarball (the real CSF package, not a build-templated tree).
+csf_url="${CSF_TGZ:-https://github.com/Aetherinox/csf-firewall/releases/download/15.10/csf-firewall-v15.10.tgz}"
+curl -fsSL -o csf.tgz "$csf_url" || { echo "SKIP: csf download failed"; exit 0; }
 tar -xzf csf.tgz || { echo "SKIP: csf extract failed"; exit 0; }
 cd csf || { echo "SKIP: csf dir missing"; exit 0; }
-sh install.sh >/tmp/csf-install.log 2>&1 || { echo "SKIP: csf install failed"; tail -2 /tmp/csf-install.log; exit 0; }
+sh install.sh >/tmp/csf-install.log 2>&1 || { echo "SKIP: csf install failed"; tail -3 /tmp/csf-install.log; exit 0; }
 [ -x /usr/sbin/csf ] || { echo "SKIP: csf binary missing"; exit 0; }
-echo "  csf installed: $(/usr/sbin/csf --version 2>/dev/null | head -1)"
+# Enable CSF (a real deployment is not in permanent TESTING mode). With the
+# firewall started the DENYIN/ALLOWIN chains exist, so -d/-dr/-a/-ar all apply
+# cleanly; in TESTING mode the remove commands error on missing chains and
+# poison the next csf invocation.
+sed -i 's/^TESTING = "1"/TESTING = "0"/' /etc/csf/csf.conf
+csf -e >/dev/null 2>&1 || true
+echo "  csf installed: $(/usr/sbin/csf -v 2>/dev/null | tr '\n' ' ')"
 
 OMNI="${OMNI:-/usr/local/bin/omniban}"
 pass=0; fail=0

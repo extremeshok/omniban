@@ -19,20 +19,20 @@
 - [x] Local gate green: gofmt, `go build`, `go vet`, `golangci-lint` (0 issues),
       `go test -race`, coverage (~60%).
 - [x] Builds and all tests pass on real Linux (golang:1.26 container), not just darwin.
-- [x] **Live e2e against real tools (`make e2e`, privileged Linux containers).**
-      12 of 13 backends validated live: nftables, iptables, ipset (own
-      namespaces + referencing rule), blackhole routes, `/etc/hosts` sinkhole,
-      ufw, sshguard (whitelist + nft set), denyhosts (file contract), apf,
-      a real fail2ban daemon (unban via `fail2ban-client`), and a real CrowdSec
-      Local API (decisions add/list/delete via `cscli`). Plus lockout guard,
-      dry-run, undo, and audit. Live testing caught and fixed three real
-      integration bugs: `unban <domain>` over-resolving DNS, apf's `-u` not
-      cleaning `deny_hosts.rules`, and the CrowdSec parser not handling the
-      alert-wrapped `cscli decisions list -o json` schema.
-- [ ] CSF and firewalld live e2e: CSF's source host is DNS-blocked in the
-      current sandbox and firewalld needs dbus/systemd; both are fixture-validated
-      and run on the target-distro VPS (CSF works once `download.configserver.com` resolves).
+- [x] **Live e2e against real tools (`make e2e`, privileged Linux containers) —
+      all 13 backends.** nftables, iptables, ipset (own namespaces + referencing
+      rule), blackhole routes, `/etc/hosts` sinkhole, ufw, sshguard (whitelist +
+      nft set), denyhosts (file contract), apf, a real fail2ban daemon (unban via
+      `fail2ban-client`), a real CrowdSec Local API (`cscli` decisions), real CSF
+      (enabled, csf.deny/csf.allow via `csf -d/-dr/-a/-ar`), and real firewalld
+      (rich rules over dbus). Plus lockout guard, dry-run, undo, and audit. Live
+      testing caught and fixed three real integration bugs: `unban <domain>`
+      over-resolving DNS, apf's `-u` not cleaning `deny_hosts.rules`, and the
+      CrowdSec parser not handling the alert-wrapped `cscli decisions list -o json`
+      schema.
 - [ ] poll-ci green on the CI VPS (gitleaks/hadolint/trivy run there) — pending the CI image build.
+- [ ] Multi-distro confirmation on the target-distro VPS (AlmaLinux/CloudLinux/Proxmox)
+      via the same `make e2e` suite (E2E_IMAGE override).
 - [ ] Follow-ups: foreign-enforcement scan to populate AlsoSeenIn; reboot
       persistence for raw nft/iptables/ipset; TUI ban/allow input modals.
 

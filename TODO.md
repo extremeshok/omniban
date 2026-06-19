@@ -53,9 +53,9 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 
 ## M7 — Live container e2e for all backends  (done)
 - [x] `test/e2e/` suite + `make e2e`: real-tool e2e in privileged containers
-- [x] live: nftables, iptables, ipset, blackhole, hosts, ufw, sshguard, denyhosts, apf, fail2ban (daemon), crowdsec (LAPI)
+- [x] live (all 13): nftables, iptables, ipset, blackhole, hosts, ufw, sshguard, denyhosts, apf, fail2ban (daemon), crowdsec (LAPI), csf (enabled), firewalld (dbus)
 - [x] bugs found+fixed live: unban-domain DNS, apf `-u` file cleanup, crowdsec alert-wrapped JSON parser
-- [ ] csf/firewalld live: env-blocked here (configserver DNS / dbus); fixture-validated, run on VPS
+- [ ] multi-distro confirmation (AlmaLinux/CloudLinux/Proxmox) via E2E_IMAGE on the VPS
 
 ## Roadmap (post-1.0)
 - [ ] Wazuh/OSSEC active-response; Shorewall; FireHOL/update-ipsets; pve-firewall
