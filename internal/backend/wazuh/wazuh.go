@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package wazuh adapts Wazuh/OSSEC active-response: IP blocks are applied and
 // removed through the firewall-drop active-response script, and listed from the

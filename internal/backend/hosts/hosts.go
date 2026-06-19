@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package hosts adapts /etc/hosts domain sinkholes (outbound, domain-scoped).
 // It scans the whole file for any 0.0.0.0 / 127.0.0.1 / :: / ::1 mapping —

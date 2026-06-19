@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package safety prevents self-lockout and records an undo journal. The guard
 // refuses (without --force) to ban any address in the protected set: the

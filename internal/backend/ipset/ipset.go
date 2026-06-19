@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package ipset adapts raw ipset. A set only drops traffic when an
 // iptables/nft rule references it, so this adapter ensures a referencing rule

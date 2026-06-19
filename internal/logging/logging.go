@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package logging configures the process diagnostic logger (slog). This is
 // distinct from the audit trail in internal/audit, which records mutations.

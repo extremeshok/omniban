@@ -3,7 +3,7 @@
 **One ban manager for every Linux firewall & IDS.**
 
 [![Release](https://img.shields.io/github/v/release/extremeshok/omniban?sort=semver)](https://github.com/extremeshok/omniban/releases)
-[![License: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Go](https://img.shields.io/badge/go-1.26-00ADD8?logo=go&logoColor=white)](go.mod)
 [![Platform](https://img.shields.io/badge/platform-linux%20amd64%20%7C%20arm64-555)](https://github.com/extremeshok/omniban/releases)
 
@@ -176,4 +176,4 @@ via [`extremeshok/poll-ci`](.poll-ci.yml).
 
 ## License
 
-BSD 3-Clause. Coded by Adrian Jon Kriel :: admin@extremeshok.com
+MIT. Coded by Adrian Jon Kriel :: admin@extremeshok.com

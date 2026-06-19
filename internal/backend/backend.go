@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package backend defines the adapter contract every ban mechanism implements,
 // plus shared detection helpers. Concrete adapters live in sub-packages; the

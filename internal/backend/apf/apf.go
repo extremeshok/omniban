@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package apf adapts Advanced Policy Firewall (APF) and its companion Brute
 // Force Detection daemon (BFD). APF owns the deny/allow rule files; BFD detects

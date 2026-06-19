@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package sshguard adapts sshguard, a lightweight SSH brute-force IDS that
 // blocks via an nftables/ipset set and whitelists via /etc/sshguard/whitelist.

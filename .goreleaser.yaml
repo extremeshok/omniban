@@ -63,7 +63,7 @@ nfpms:
     homepage: https://github.com/extremeshok/omniban
     maintainer: Adrian Jon Kriel <admin@extremeshok.com>
     description: One ban manager for every Linux firewall & IDS.
-    license: BSD-3-Clause
+    license: MIT
     formats:
       - deb
       - rpm

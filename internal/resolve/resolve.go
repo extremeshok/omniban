@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package resolve turns a user query into matches against the unified entry
 // list. It supports exact, CIDR-containment, wildcard/glob, and domain queries,

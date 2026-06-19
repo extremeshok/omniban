@@ -1,7 +1,7 @@
 // omniban — one ban manager for every Linux firewall & IDS.
 //
 // Coded by Adrian Jon Kriel :: admin@extremeshok.com
-// Licensed under the BSD 3-Clause License.
+// Licensed under the MIT License.
 
 // Package firewalld adapts firewalld (the default on RHEL clones / CloudLinux).
 // omniban manages its bans and allows as permanent source-address rich rules so
