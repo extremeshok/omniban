@@ -32,7 +32,7 @@ func (Unimplemented) Ban(context.Context, model.ActionRequest) (model.Result, er
 }
 
 // Unban reports that the backend cannot remove a ban.
-func (Unimplemented) Unban(context.Context, model.Entry) (model.Result, error) {
+func (Unimplemented) Unban(context.Context, model.Entry, bool) (model.Result, error) {
 	return model.Result{}, ErrNotImplemented
 }
 
@@ -42,7 +42,7 @@ func (Unimplemented) Allow(context.Context, model.ActionRequest) (model.Result, 
 }
 
 // RemoveAllow reports that the backend cannot remove an allowlist entry.
-func (Unimplemented) RemoveAllow(context.Context, model.Entry) (model.Result, error) {
+func (Unimplemented) RemoveAllow(context.Context, model.Entry, bool) (model.Result, error) {
 	return model.Result{}, ErrNotImplemented
 }
 

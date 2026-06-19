@@ -76,6 +76,13 @@ func (a *app) rootCmd() *cobra.Command {
 		a.doctorCmd(),
 		a.versionCmd(),
 		a.initCmd(),
+		a.listCmd(),
+		a.checkCmd(),
+		a.banCmd(),
+		a.unbanCmd(),
+		a.allowCmd(),
+		a.unallowCmd(),
+		a.undoCmd(),
 	)
 	return root
 }

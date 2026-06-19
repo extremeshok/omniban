@@ -57,9 +57,9 @@ type Backend interface {
 	ListAllows(ctx context.Context) ([]model.Entry, error)
 
 	Ban(ctx context.Context, req model.ActionRequest) (model.Result, error)
-	Unban(ctx context.Context, e model.Entry) (model.Result, error)
+	Unban(ctx context.Context, e model.Entry, dryRun bool) (model.Result, error)
 	Allow(ctx context.Context, req model.ActionRequest) (model.Result, error)
-	RemoveAllow(ctx context.Context, e model.Entry) (model.Result, error)
+	RemoveAllow(ctx context.Context, e model.Entry, dryRun bool) (model.Result, error)
 
 	// Reload persists/applies pending changes (firewalld --reload, csf -r, ...).
 	Reload(ctx context.Context) error
