@@ -10,7 +10,7 @@ LDFLAGS := -s -w -X main.version=$(VERSION)
 COVERAGE_PACKAGES := ./internal/... ./cmd/...
 
 .PHONY: all tidy build install run fmt vet lint test test-coverage coverage-check \
-        security-scan security-scan-gosec security-scan-govulncheck clean
+        security-scan security-scan-gosec security-scan-govulncheck e2e clean
 
 all: fmt vet lint test
 
@@ -53,6 +53,10 @@ security-scan-gosec:
 
 security-scan-govulncheck:
 	govulncheck ./...
+
+# Live e2e against real tools in a privileged Linux container (requires Docker).
+e2e:
+	./test/e2e/run.sh
 
 clean:
 	rm -rf bin coverage.out

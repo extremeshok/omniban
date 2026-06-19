@@ -19,10 +19,12 @@
 - [x] Local gate green: gofmt, `go build`, `go vet`, `golangci-lint` (0 issues),
       `go test -race`, coverage (~60%).
 - [x] Builds and all tests pass on real Linux (golang:1.26 container), not just darwin.
-- [x] **Live e2e (privileged Linux container, real kernel netfilter): 24/24 checks pass** —
-      nftables (own table), iptables (own chain), ipset (own set + referencing rule),
-      blackhole routes, `/etc/hosts` sinkhole (create + remove + External detection),
-      lockout guard, dry-run, undo, and the audit trail, all against live tools.
+- [x] **Live e2e (`make e2e`, privileged Linux container): 28/28 checks pass.**
+      Netfilter suite (24): nftables (own table), iptables (own chain), ipset
+      (own set + referencing rule), blackhole routes, `/etc/hosts` sinkhole
+      (create + remove + External detection), lockout guard, dry-run, undo, audit.
+      fail2ban-daemon suite (4): a real fail2ban server — omniban lists the
+      jail-attributed ban, finds it, and unbans through `fail2ban-client`.
 - [ ] poll-ci green on the CI VPS (gitleaks/hadolint/trivy run there) — pending the CI image build.
 - [ ] Real-service e2e for the IDS backends (fail2ban/CrowdSec/CSF/APF/denyhosts/sshguard)
       on a systemd VPS across the target distros — parsers are validated against captured
