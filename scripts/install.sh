@@ -61,6 +61,11 @@ main() {
 
   echo "installed ${BIN} to ${PREFIX}/${BIN}"
   "${PREFIX}/${BIN}" version
+
+  echo
+  echo "self-update is enabled for this standalone install:"
+  echo "  sudo ${BIN} update                # update to the latest release"
+  echo "  sudo ${BIN} update --enable-timer # opt in to automatic daily updates"
 }
 
 main "$@"

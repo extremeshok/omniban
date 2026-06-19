@@ -23,11 +23,12 @@ import (
 
 // app holds shared state and parsed global flags for the command tree.
 type app struct {
-	cfg     config.Config
-	runner  exec.Runner
-	mgr     *manager.Manager
-	out     io.Writer
-	version string
+	cfg           config.Config
+	runner        exec.Runner
+	mgr           *manager.Manager
+	out           io.Writer
+	version       string
+	installSource string
 
 	flagConfig   string
 	flagJSON     bool
@@ -38,10 +39,11 @@ type app struct {
 	flagLogLevel string
 }
 
-// Execute builds and runs the root command bound to ctx. version is the
-// stamped build version.
-func Execute(ctx context.Context, version string) error {
-	a := &app{out: os.Stdout, runner: exec.New(), version: version}
+// Execute builds and runs the root command bound to ctx. version is the stamped
+// build version; installSource is the stamped distribution channel ("package"
+// for .deb/.rpm, empty for standalone builds).
+func Execute(ctx context.Context, version, installSource string) error {
+	a := &app{out: os.Stdout, runner: exec.New(), version: version, installSource: installSource}
 	return a.rootCmd().ExecuteContext(ctx)
 }
 
@@ -91,6 +93,7 @@ func (a *app) rootCmd() *cobra.Command {
 		a.nullRouteCmd(),
 		a.applyRoutesCmd(),
 		a.undoCmd(),
+		a.updateCmd(),
 	)
 	return root
 }

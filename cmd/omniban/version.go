@@ -16,6 +16,14 @@ import "runtime/debug"
 // the Go toolchain embeds from the VCS tag.
 var version = ""
 
+// installSource records how this binary was distributed. It is stamped to
+// "package" for the .deb/.rpm builds (see .goreleaser.yaml) so self-update can
+// defer to the distro package manager; it stays empty for the standalone
+// tarball, the curl|bash installer, `go build`, and `go install`.
+//
+//	go build -ldflags "-X main.installSource=package"
+var installSource = ""
+
 func init() {
 	if version != "" {
 		return

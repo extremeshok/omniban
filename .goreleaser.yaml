@@ -8,6 +8,10 @@ before:
   hooks:
     - go mod tidy
 
+# Two builds from one source: the standalone binary (shipped in the tar.gz, via
+# install.sh and `go install`) keeps self-update enabled; the package binary
+# (shipped in .deb/.rpm) is stamped installSource=package so self-update defers
+# to apt/dnf. They are otherwise identical.
 builds:
   - id: omniban
     main: ./cmd/omniban
@@ -23,9 +27,25 @@ builds:
       - -trimpath
     ldflags:
       - -s -w -X main.version={{ .Version }}
+  - id: omniban-pkg
+    main: ./cmd/omniban
+    binary: omniban
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }} -X main.installSource=package
 
 archives:
   - id: omniban
+    ids:
+      - omniban
     formats:
       - tar.gz
     files:
@@ -37,6 +57,8 @@ checksum:
 
 nfpms:
   - id: omniban
+    ids:
+      - omniban-pkg
     package_name: omniban
     homepage: https://github.com/extremeshok/omniban
     maintainer: Adrian Jon Kriel <admin@extremeshok.com>

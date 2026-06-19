@@ -12,6 +12,7 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/v2 v2.3.5
 	github.com/spf13/cobra v1.10.2
+	golang.org/x/mod v0.37.0
 )
 
 require (

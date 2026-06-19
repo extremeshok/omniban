@@ -45,6 +45,10 @@ type Config struct {
 	DisabledBackends []string `koanf:"disabled_backends"`
 	// LogLevel for the diagnostic slog logger (debug|info|warn|error).
 	LogLevel string `koanf:"log_level"`
+	// UpdateCheck enables the passive "a newer version is available" notice on
+	// standalone-binary installs. It has no effect on .deb/.rpm builds, which
+	// defer to the distribution package manager.
+	UpdateCheck bool `koanf:"update_check"`
 }
 
 // Default returns the built-in defaults.
@@ -55,6 +59,7 @@ func Default() Config {
 		StateDir:         DefaultStateDir,
 		RefreshSeconds:   0,
 		LogLevel:         "info",
+		UpdateCheck:      true,
 	}
 }
 
@@ -122,5 +127,6 @@ func defaultMap() map[string]any {
 		"state_dir":          d.StateDir,
 		"refresh_seconds":    d.RefreshSeconds,
 		"log_level":          d.LogLevel,
+		"update_check":       d.UpdateCheck,
 	}
 }

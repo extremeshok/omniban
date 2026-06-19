@@ -21,7 +21,7 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
-	if err := cli.Execute(ctx, version); err != nil {
+	if err := cli.Execute(ctx, version, installSource); err != nil {
 		fmt.Fprintln(os.Stderr, "omniban: "+err.Error())
 		os.Exit(1)
 	}

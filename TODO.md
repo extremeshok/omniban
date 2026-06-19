@@ -69,6 +69,19 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] live container e2e: suricata 3/3, wazuh 5/5, shorewall 4/4, haproxy 4/4, modsecurity 6/6 (incl. real 403); bunkerweb SKIPs (needs full stack)
 - [x] bugs found+fixed live: haproxy `set map`→`add map`, wazuh two-message AR handshake
 
+## M9 — Self-update (standalone installs only)  (done)
+- [x] `internal/selfupdate`: GitHub latest-release check, semver compare, tarball
+      download, SHA-256 verify against `checksums.txt`, atomic in-place swap (+`.bak`)
+- [x] build stamp `installSource=package` for .deb/.rpm; goreleaser split into a
+      standalone build (self-update on) and a package build (self-update off)
+- [x] runtime backstop: refuse self-update when the binary is dpkg/rpm-owned
+- [x] `omniban update` / `--check` / `--enable-timer` / `--disable-timer` (opt-in
+      systemd timer for hands-off daily updates); package builds defer to apt/dnf
+- [x] passive "newer version available" notice on `status` (throttled, cached in
+      StateDir; `update_check` config + `OMNIBAN_NO_UPDATE_CHECK` opt-out)
+- [x] hermetic tests (httptest releases + tarball + checksum verify + swap); install.sh hint
+- [ ] follow-up: sign `checksums.txt` (cosign/minisign) and verify the signature before applying
+
 ## Roadmap (post-1.0)
 - [ ] FireHOL/update-ipsets; pve-firewall (Proxmox)
 - [ ] CrowdSec `pkg/apiclient`; threat-feed import; auto-expiry daemon

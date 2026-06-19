@@ -13,6 +13,10 @@
 - [x] Add by IP / CIDR / hostname / domain; `sinkhole` and `null-route` with
       boot persistence (`apply-routes` + systemd oneshot).
 - [x] Safety: lockout guard, undo journal, audit trail, dry-run, file backups.
+- [x] Self-update for standalone installs (`omniban update`, opt-in systemd
+      timer, passive notice), SHA-256-verified against the release checksums and
+      atomic with a `.bak` rollback; hard-disabled for .deb/.rpm builds (stamped
+      `installSource=package`, with a dpkg/rpm-owned runtime backstop).
 - [x] TUI + full CLI; `doctor`/`status` health and warnings.
 - [x] `AGENTS.md` honored (no AI attribution, no emoji).
 - [x] Packaging: goreleaser builds static amd64/arm64 binaries + `.deb`/`.rpm` +

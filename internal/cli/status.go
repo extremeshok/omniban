@@ -29,6 +29,7 @@ func (a *app) statusCmd() *cobra.Command {
 				return a.printStatusJSON(statuses)
 			}
 			a.printStatusTable(statuses)
+			a.maybeNotifyUpdate(cmd.Context())
 			return nil
 		},
 	}

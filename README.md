@@ -79,6 +79,29 @@ Run `sudo omniban` with no arguments (on a terminal) for the interactive TUI,
 or `sudo omniban tui`. Add `--dry-run` to any mutating command to preview the
 exact native command(s) without executing.
 
+## Updating
+
+How omniban updates depends on how it was installed:
+
+- **`.deb`/`.rpm`:** updates come from your package manager
+  (`apt-get install --only-upgrade omniban`, `dnf upgrade omniban`). The built-in
+  self-updater is disabled for packages and points you here.
+- **Standalone binary** (the `.tar.gz` or `install.sh`): omniban can update
+  itself. The download is verified against the release `checksums.txt` (SHA-256)
+  before the running binary is atomically replaced (the old one is kept at
+  `<path>.bak`).
+
+```sh
+sudo omniban update                  # update to the latest release
+sudo omniban update --check          # report whether a newer version exists
+sudo omniban update --enable-timer   # opt in to automatic daily updates (systemd)
+sudo omniban update --disable-timer  # turn automatic updates back off
+```
+
+A passive "a newer version is available" notice appears on `omniban status` for
+standalone installs (throttled to one check per day; disable with
+`update_check: false` in the config or `OMNIBAN_NO_UPDATE_CHECK=1`).
+
 ## Development
 
 ```sh
