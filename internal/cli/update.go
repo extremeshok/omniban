@@ -52,12 +52,20 @@ Description=omniban daily self-update
 
 [Timer]
 OnCalendar=daily
-RandomizedDelaySec=1h
+RandomizedDelaySec=6h
 Persistent=true
 
 [Install]
 WantedBy=timers.target
 `
+
+// updateAvailableError makes `update --check` exit 10 when a newer release
+// exists, mirroring pi-optimiser's --check-update convention. main maps any
+// error exposing ExitCode() to that code without printing a message.
+type updateAvailableError struct{}
+
+func (updateAvailableError) Error() string { return "update available" }
+func (updateAvailableError) ExitCode() int { return 10 }
 
 func (a *app) updateCmd() *cobra.Command {
 	var checkOnly, enableTimer, disableTimer bool
@@ -116,6 +124,11 @@ func (a *app) runUpdate(ctx context.Context, checkOnly bool) error {
 
 	if checkOnly {
 		a.printUpdateStatus(st, managed)
+		if st.Available {
+			// Exit 10 when a newer release exists (mirrors pi-optimiser's
+			// --check-update) so `if ! omniban update --check; then ...` works.
+			return updateAvailableError{}
+		}
 		return nil
 	}
 	if managed {

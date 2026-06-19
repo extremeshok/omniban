@@ -93,10 +93,13 @@ How omniban updates depends on how it was installed:
 
 ```sh
 sudo omniban update                  # update to the latest release
-sudo omniban update --check          # report whether a newer version exists
+sudo omniban update --check          # report whether a newer version exists (exit 10 if so)
 sudo omniban update --enable-timer   # opt in to automatic daily updates (systemd)
 sudo omniban update --disable-timer  # turn automatic updates back off
 ```
+
+`update --check` exits `10` when a newer release is available (and `0` when up to
+date), so it scripts cleanly: `if ! omniban update --check; then sudo omniban update; fi`.
 
 A passive "a newer version is available" notice appears on `omniban status` for
 standalone installs (throttled to one check per day; disable with
