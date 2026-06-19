@@ -1,0 +1,6 @@
+# Advanced Policy Firewall - allow_hosts.rules
+# trusted hosts that bypass APF blocks
+
+10.0.0.5 # omniban: office gateway
+192.168.0.0/16 # internal lan
+d=443:s=8.8.8.8 # allow https from dns host

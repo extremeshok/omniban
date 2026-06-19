@@ -16,17 +16,17 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] Makefile, `.golangci.yml`, `.poll-ci.yml`, Dockerfile, AGENTS.md, docs, license
 - [x] green local gate: build, vet, golangci-lint, `go test -race`, coverage
 
-## M2 — IDS backends RW + search + safety
-- [ ] `internal/resolve`: hostname→IP + match engine (exact / CIDR-contains / glob)
-- [ ] `internal/safety`: lockout guard (protected set), confirmation, undo journal
-- [ ] CrowdSec: list/ban/unban via `cscli decisions`, allowlists, golden fixtures
-- [ ] fail2ban: per-jail list/ban/unban, ignoreip allow, golden fixtures
-- [ ] sshguard: list/ban/unban via nft set, whitelist file
-- [ ] CSF: list/ban/unban/allow via `csf`, file parsing
-- [ ] APF/BFD: list/ban/unban/allow via `apf`, BFD attribution
-- [ ] denyhosts: list/ban/unban (daemon coordination + backups), allowed-hosts
-- [ ] CLI: `list`, `check`, `ban`, `unban`, `allow`, `unallow` (+ `--dry-run`/`--json`)
-- [ ] manager dedup/attribution v1; wire audit + undo
+## M2 — IDS backends RW + search + safety  (done)
+- [x] `internal/resolve`: hostname→IP + match engine (exact / CIDR-contains / glob)
+- [x] `internal/safety`: lockout guard (protected set) + undo journal
+- [x] CrowdSec: list/ban/unban via `cscli decisions`, allowlists, golden fixtures
+- [x] fail2ban: per-jail list + all-jails/per-jail unban, golden fixtures
+- [x] sshguard: whitelist allow/remove + best-effort nft list/unban
+- [x] CSF: list/ban/unban/allow via `csf`, file parsing
+- [x] APF/BFD: list/ban/unban/allow via `apf`, BFD attribution
+- [x] denyhosts: list/ban/unban (daemon coordination + backups), allowed-hosts
+- [x] CLI: `list`, `check`, `ban`, `unban`, `allow`, `unallow`, `undo` (+ `--dry-run`/`--json`)
+- [x] manager dedup/attribution + audit + undo + lockout guard
 
 ## M3 — Firewall/enforcement RW
 - [ ] UFW, firewalld, raw nftables (own table), raw iptables (own chain)

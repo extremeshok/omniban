@@ -26,10 +26,20 @@ const (
 type Backend struct {
 	backend.Unimplemented
 	r exec.Runner
+
+	// Rule-file paths are overridable so tests can point them at temp files.
+	denyFile  string
+	allowFile string
 }
 
-// New constructs an APF adapter.
-func New(r exec.Runner) *Backend { return &Backend{r: r} }
+// New constructs an APF adapter with the standard /etc/apf rule-file locations.
+func New(r exec.Runner) *Backend {
+	return &Backend{
+		r:         r,
+		denyFile:  "/etc/apf/deny_hosts.rules",
+		allowFile: "/etc/apf/allow_hosts.rules",
+	}
+}
 
 // Name returns the backend identifier.
 func (b *Backend) Name() string { return string(model.OriginAPF) }

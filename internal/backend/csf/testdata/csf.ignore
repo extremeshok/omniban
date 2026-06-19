@@ -1,0 +1,5 @@
+# Copyright (C) 2006-2024 Jonathan Michaelson
+###############################################################################
+# The following IP addresses will be ignored by lfd (never blocked)
+###############################################################################
+192.0.2.250 # monitoring host

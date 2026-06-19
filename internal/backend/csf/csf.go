@@ -20,10 +20,22 @@ import (
 type Backend struct {
 	backend.Unimplemented
 	r exec.Runner
+
+	// File paths are overridable so tests can point them at temp files.
+	denyFile   string
+	allowFile  string
+	ignoreFile string
 }
 
-// New constructs a CSF adapter.
-func New(r exec.Runner) *Backend { return &Backend{r: r} }
+// New constructs a CSF adapter with the standard /etc/csf file locations.
+func New(r exec.Runner) *Backend {
+	return &Backend{
+		r:          r,
+		denyFile:   "/etc/csf/csf.deny",
+		allowFile:  "/etc/csf/csf.allow",
+		ignoreFile: "/etc/csf/csf.ignore",
+	}
+}
 
 // Name returns the backend identifier.
 func (b *Backend) Name() string { return string(model.OriginCSF) }

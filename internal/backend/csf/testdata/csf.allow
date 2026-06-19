@@ -1,0 +1,9 @@
+# Copyright (C) 2006-2024 Jonathan Michaelson
+###############################################################################
+# The following IP addresses will be allowed in iptables
+# One IP address per line
+# CIDR addressing allowed with a quaded IP (e.g. 192.168.254.0/24)
+###############################################################################
+192.0.2.10 # omniban: office gateway
+203.0.113.0/24 # trusted partner network
+2001:db8:abcd::/48 # corp IPv6 block

@@ -34,11 +34,11 @@ func (b *Backend) Capabilities() backend.Capabilities {
 		Layer:          model.LayerIDS,
 		Directions:     []model.Direction{model.DirInbound},
 		Scopes:         []model.Scope{model.ScopeIP},
-		CanBan:         true,
+		CanBan:         false, // manual bans belong on a firewall backend; fail2ban bans are per-jail/auto
 		CanUnban:       true,
-		CanAllow:       true, // via ignoreip
-		CanRemoveAllow: true,
-		SupportsCIDR:   false, // bans are per-IP; CIDR only in ignoreip
+		CanAllow:       false,
+		CanRemoveAllow: false,
+		SupportsCIDR:   false, // bans are per-IP
 		SupportsIPv6:   true,
 	}
 }

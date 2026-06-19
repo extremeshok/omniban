@@ -1,0 +1,12 @@
+# Copyright (C) 2006-2024 Jonathan Michaelson
+###############################################################################
+# The following IP addresses will be blocked in iptables
+# One IP address per line
+# CIDR addressing allowed with a quaded IP (e.g. 192.168.254.0/24)
+###############################################################################
+1.2.3.4 # lfd: (sshd) Failed SSH login from 1.2.3.4: 2024-01-02 03:04:05
+5.6.7.8 # omniban: manual block
+10.0.0.0/24 # Denied network range
+2001:db8::1 # lfd: (smtpauth) Failed SMTP AUTH login from 2001:db8::1
+
+198.51.100.7

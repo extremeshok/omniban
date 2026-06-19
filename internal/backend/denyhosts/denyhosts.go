@@ -11,6 +11,7 @@ package denyhosts
 
 import (
 	"context"
+	"path/filepath"
 
 	"github.com/extremeshok/omniban/internal/backend"
 	"github.com/extremeshok/omniban/internal/exec"
@@ -21,10 +22,27 @@ import (
 type Backend struct {
 	backend.Unimplemented
 	r exec.Runner
+
+	// File and service locations, overridable in tests. workDir holds the
+	// DenyHosts work files ("hosts" and "hosts-restricted") that must be kept in
+	// sync with hostsDeny; allowedHosts is the DenyHosts allowlist.
+	hostsDeny    string
+	workDir      string
+	allowedHosts string
+	service      string
 }
 
-// New constructs a DenyHosts adapter.
-func New(r exec.Runner) *Backend { return &Backend{r: r} }
+// New constructs a DenyHosts adapter with the distribution default paths.
+func New(r exec.Runner) *Backend {
+	workDir := "/var/lib/denyhosts"
+	return &Backend{
+		r:            r,
+		hostsDeny:    "/etc/hosts.deny",
+		workDir:      workDir,
+		allowedHosts: filepath.Join(workDir, "allowed-hosts"),
+		service:      "denyhosts",
+	}
+}
 
 // Name returns the backend identifier.
 func (b *Backend) Name() string { return string(model.OriginDenyHosts) }

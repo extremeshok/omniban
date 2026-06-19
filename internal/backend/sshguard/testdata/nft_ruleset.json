@@ -1,0 +1,74 @@
+{
+  "nftables": [
+    {
+      "metainfo": {
+        "version": "1.0.6",
+        "release_name": "Lester Gooch",
+        "json_schema_version": 1
+      }
+    },
+    {
+      "table": {
+        "family": "ip",
+        "name": "filter",
+        "handle": 1
+      }
+    },
+    {
+      "set": {
+        "family": "ip",
+        "name": "trusted",
+        "table": "filter",
+        "type": "ipv4_addr",
+        "handle": 2,
+        "elem": [
+          "203.0.113.9"
+        ]
+      }
+    },
+    {
+      "table": {
+        "family": "ip",
+        "name": "sshguard",
+        "handle": 3
+      }
+    },
+    {
+      "set": {
+        "family": "ip",
+        "name": "attackers",
+        "table": "sshguard",
+        "type": "ipv4_addr",
+        "handle": 4,
+        "elem": [
+          "192.168.1.66",
+          {
+            "prefix": {
+              "addr": "10.20.0.0",
+              "len": 24
+            }
+          }
+        ]
+      }
+    },
+    {
+      "table": {
+        "family": "ip6",
+        "name": "sshguard",
+        "handle": 5
+      }
+    },
+    {
+      "set": {
+        "family": "ip6",
+        "name": "attackers",
+        "table": "sshguard",
+        "type": "ipv6_addr",
+        "handle": 6,
+        "elem": [
+          "2001:db8:dead:beef::1"
+        ]
+      }
+    }
+  ]
+}

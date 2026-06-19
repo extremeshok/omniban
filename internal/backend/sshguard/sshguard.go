@@ -19,10 +19,15 @@ import (
 type Backend struct {
 	backend.Unimplemented
 	r exec.Runner
+
+	// whitelist is the sshguard allowlist file; overridable in tests.
+	whitelist string
 }
 
 // New constructs an sshguard adapter.
-func New(r exec.Runner) *Backend { return &Backend{r: r} }
+func New(r exec.Runner) *Backend {
+	return &Backend{r: r, whitelist: "/etc/sshguard/whitelist"}
+}
 
 // Name returns the backend identifier.
 func (b *Backend) Name() string { return string(model.OriginSSHGuard) }
@@ -33,9 +38,9 @@ func (b *Backend) Capabilities() backend.Capabilities {
 		Layer:          model.LayerIDS,
 		Directions:     []model.Direction{model.DirInbound},
 		Scopes:         []model.Scope{model.ScopeIP, model.ScopeRange},
-		CanBan:         true,
-		CanUnban:       true,
-		CanAllow:       true, // via /etc/sshguard/whitelist
+		CanBan:         false, // sshguard auto-bans; omniban does not create bans
+		CanUnban:       true,  // best-effort: delete the nftables set element
+		CanAllow:       true,  // via /etc/sshguard/whitelist
 		CanRemoveAllow: true,
 		SupportsCIDR:   true,
 		SupportsIPv6:   true,
