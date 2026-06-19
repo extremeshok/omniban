@@ -135,17 +135,21 @@ func (a *app) unbanCmd() *cobra.Command {
 			if err := requireRoot(); err != nil {
 				return err
 			}
-			targets, _, err := a.expandTargets(cmd.Context(), args[0], "")
-			if err != nil {
-				return err
-			}
+			targets := a.expandTargetsLenient(cmd.Context(), args[0])
 			var results []model.Result
+			var lastErr error
+			matched := false
 			for _, t := range targets {
 				rs, uerr := a.mgr.Unban(cmd.Context(), t, via, allBackends, a.flagDryRun)
 				results = append(results, rs...)
 				if uerr != nil {
-					return uerr
+					lastErr = uerr
+					continue
 				}
+				matched = true
+			}
+			if !matched && len(results) == 0 {
+				return lastErr
 			}
 			return a.renderResults(results)
 		},
@@ -200,17 +204,21 @@ func (a *app) unallowCmd() *cobra.Command {
 			if err := requireRoot(); err != nil {
 				return err
 			}
-			targets, _, err := a.expandTargets(cmd.Context(), args[0], "")
-			if err != nil {
-				return err
-			}
+			targets := a.expandTargetsLenient(cmd.Context(), args[0])
 			var results []model.Result
+			var lastErr error
+			matched := false
 			for _, t := range targets {
 				rs, uerr := a.mgr.Unallow(cmd.Context(), t, via, a.flagDryRun)
 				results = append(results, rs...)
 				if uerr != nil {
-					return uerr
+					lastErr = uerr
+					continue
 				}
+				matched = true
+			}
+			if !matched && len(results) == 0 {
+				return lastErr
 			}
 			return a.renderResults(results)
 		},
@@ -238,6 +246,28 @@ func (a *app) undoCmd() *cobra.Command {
 }
 
 // --- helpers ---------------------------------------------------------------
+
+// expandTargetsLenient builds the removal targets for unban/unallow. The raw
+// value is always included (so a domain sinkhole or an exact entry matches by
+// name); for a hostname it also appends any resolved addresses, best-effort —
+// a resolution failure is not fatal here, unlike for ban/allow.
+func (a *app) expandTargetsLenient(ctx context.Context, value string) []string {
+	targets := []string{value}
+	if _, err := netip.ParseAddr(value); err == nil {
+		return targets
+	}
+	if _, err := netip.ParsePrefix(value); err == nil {
+		return targets
+	}
+	if validate.Hostname(value) == nil {
+		if addrs, err := a.mgr.Resolver().Hostname(ctx, value); err == nil {
+			for _, x := range addrs {
+				targets = append(targets, x.String())
+			}
+		}
+	}
+	return targets
+}
 
 // expandTargets validates the input and, for a hostname (when scope is not
 // domain), resolves it to addresses. IP/CIDR/domain inputs pass through as-is.

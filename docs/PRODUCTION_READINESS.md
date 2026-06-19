@@ -18,8 +18,15 @@
       checksums (snapshot verified); install script; systemd unit.
 - [x] Local gate green: gofmt, `go build`, `go vet`, `golangci-lint` (0 issues),
       `go test -race`, coverage (~60%).
+- [x] Builds and all tests pass on real Linux (golang:1.26 container), not just darwin.
+- [x] **Live e2e (privileged Linux container, real kernel netfilter): 24/24 checks pass** —
+      nftables (own table), iptables (own chain), ipset (own set + referencing rule),
+      blackhole routes, `/etc/hosts` sinkhole (create + remove + External detection),
+      lockout guard, dry-run, undo, and the audit trail, all against live tools.
 - [ ] poll-ci green on the CI VPS (gitleaks/hadolint/trivy run there) — pending the CI image build.
-- [ ] Live e2e on the provided VPS across the target distros.
+- [ ] Real-service e2e for the IDS backends (fail2ban/CrowdSec/CSF/APF/denyhosts/sshguard)
+      on a systemd VPS across the target distros — parsers are validated against captured
+      real tool output (golden fixtures); the live daemon path is the last mile.
 - [ ] Follow-ups: foreign-enforcement scan to populate AlsoSeenIn; reboot
       persistence for raw nft/iptables/ipset; TUI ban/allow input modals.
 
