@@ -74,15 +74,13 @@ func (b *Backend) Ban(ctx context.Context, req model.ActionRequest) (model.Resul
 	return b.run(ctx, req.DryRun, "ban", req.Value, [][]string{c})
 }
 
-// Unban removes a deny entry via "apf -u", which deletes the host from the
-// rule files.
+// Unban removes a deny entry. APF's own "-u" does not reliably edit the rule
+// file (and "-d" also leaves a "# added ..." comment line), so omniban removes
+// every line referencing the value from deny_hosts.rules — the authoritative
+// store that survives reloads — then best-effort runs "apf -u" to drop the live
+// firewall rule.
 func (b *Backend) Unban(ctx context.Context, e model.Entry, dryRun bool) (model.Result, error) {
-	bin := b.bin()
-	if bin == "" {
-		return model.Result{}, errNoBinary
-	}
-	c := cmd(bin, "-u", e.Value)
-	return b.run(ctx, dryRun, "unban", e.Value, [][]string{c})
+	return b.remove(ctx, dryRun, "unban", e.Value, b.denyFile)
 }
 
 // Allow adds an allow rule via "apf -a", which appends the host to
@@ -96,15 +94,38 @@ func (b *Backend) Allow(ctx context.Context, req model.ActionRequest) (model.Res
 	return b.run(ctx, req.DryRun, "allow", req.Value, [][]string{c})
 }
 
-// RemoveAllow removes an allow entry via "apf -u". APF's -u removes the host
-// from the rule files (both deny and allow), so the same flag covers unallow.
+// RemoveAllow removes an allow entry from allow_hosts.rules (authoritative),
+// then best-effort runs "apf -u" to drop the live rule.
 func (b *Backend) RemoveAllow(ctx context.Context, e model.Entry, dryRun bool) (model.Result, error) {
+	return b.remove(ctx, dryRun, "unallow", e.Value, b.allowFile)
+}
+
+// remove deletes every line referencing value from an APF rule file (backing it
+// up first), then best-effort drops the live rule with "apf -u". omniban owns
+// the file removal because APF's -u does not reliably edit the rule files.
+func (b *Backend) remove(ctx context.Context, dryRun bool, action, value, file string) (model.Result, error) {
+	res := model.Result{Backend: string(model.OriginAPF), Action: action, Value: value, DryRun: dryRun}
+	res.Commands = append(res.Commands, fmt.Sprintf("remove lines matching %q from %s", value, file))
 	bin := b.bin()
-	if bin == "" {
-		return model.Result{}, errNoBinary
+	if bin != "" {
+		res.Commands = append(res.Commands, strings.Join(cmd(bin, "-u", value), " "))
 	}
-	c := cmd(bin, "-u", e.Value)
-	return b.run(ctx, dryRun, "unallow", e.Value, [][]string{c})
+	if dryRun {
+		res.Message = "dry-run: not executed"
+		return res, nil
+	}
+	changed, err := removeFromFile(file, value)
+	if err != nil {
+		return res, err
+	}
+	if bin != "" {
+		_, _ = b.r.Run(ctx, bin, "-u", value) // best-effort: drop the live firewall rule
+	}
+	res.Changed = changed
+	if !changed {
+		res.Message = "not present"
+	}
+	return res, nil
 }
 
 // errNoBinary is returned by mutations when the apf binary cannot be found.
@@ -137,6 +158,74 @@ func (b *Backend) run(ctx context.Context, dryRun bool, action, value string, cm
 
 func cmd(name string, args ...string) []string {
 	return append([]string{name}, args...)
+}
+
+// removeFromFile rewrites path without any line referencing value — both the
+// bare rule line and the "# added <value> ..." comment APF writes — backing the
+// file up first. A missing file is a no-op.
+func removeFromFile(path, value string) (bool, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // operator-configured rule-file path
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		return false, fmt.Errorf("read %s: %w", path, err)
+	}
+	lines := strings.Split(strings.TrimRight(string(data), "\n"), "\n")
+	kept := make([]string, 0, len(lines))
+	changed := false
+	for _, l := range lines {
+		if containsToken(l, value) {
+			changed = true
+			continue
+		}
+		kept = append(kept, l)
+	}
+	if !changed {
+		return false, nil
+	}
+	if err := backupFile(path); err != nil {
+		return false, err
+	}
+	return true, writeLines(path, kept)
+}
+
+// containsToken reports whether line contains value as a whitespace/':'/'='/'#'
+// delimited token, so removing "1.2.3.4" does not also match "1.2.3.40".
+func containsToken(line, value string) bool {
+	for _, f := range strings.FieldsFunc(line, func(r rune) bool {
+		return r == ' ' || r == '\t' || r == ':' || r == '=' || r == '#'
+	}) {
+		if f == value {
+			return true
+		}
+	}
+	return false
+}
+
+func backupFile(path string) error {
+	data, err := os.ReadFile(path) //nolint:gosec // operator-configured rule-file path
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return fmt.Errorf("read %s: %w", path, err)
+	}
+	if err := os.WriteFile(path+".omniban.bak", data, 0o644); err != nil { //nolint:gosec // rule-file backup
+		return fmt.Errorf("backup %s: %w", path, err)
+	}
+	return nil
+}
+
+func writeLines(path string, lines []string) error {
+	out := strings.Join(lines, "\n")
+	if out != "" {
+		out += "\n"
+	}
+	if err := os.WriteFile(path, []byte(out), 0o644); err != nil { //nolint:gosec // operator-configured rule-file path
+		return fmt.Errorf("write %s: %w", path, err)
+	}
+	return nil
 }
 
 // reasonOf returns a non-empty reason for the omniban comment tag.

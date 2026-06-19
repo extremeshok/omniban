@@ -19,16 +19,20 @@
 - [x] Local gate green: gofmt, `go build`, `go vet`, `golangci-lint` (0 issues),
       `go test -race`, coverage (~60%).
 - [x] Builds and all tests pass on real Linux (golang:1.26 container), not just darwin.
-- [x] **Live e2e (`make e2e`, privileged Linux container): 28/28 checks pass.**
-      Netfilter suite (24): nftables (own table), iptables (own chain), ipset
-      (own set + referencing rule), blackhole routes, `/etc/hosts` sinkhole
-      (create + remove + External detection), lockout guard, dry-run, undo, audit.
-      fail2ban-daemon suite (4): a real fail2ban server — omniban lists the
-      jail-attributed ban, finds it, and unbans through `fail2ban-client`.
+- [x] **Live e2e against real tools (`make e2e`, privileged Linux containers).**
+      12 of 13 backends validated live: nftables, iptables, ipset (own
+      namespaces + referencing rule), blackhole routes, `/etc/hosts` sinkhole,
+      ufw, sshguard (whitelist + nft set), denyhosts (file contract), apf,
+      a real fail2ban daemon (unban via `fail2ban-client`), and a real CrowdSec
+      Local API (decisions add/list/delete via `cscli`). Plus lockout guard,
+      dry-run, undo, and audit. Live testing caught and fixed three real
+      integration bugs: `unban <domain>` over-resolving DNS, apf's `-u` not
+      cleaning `deny_hosts.rules`, and the CrowdSec parser not handling the
+      alert-wrapped `cscli decisions list -o json` schema.
+- [ ] CSF and firewalld live e2e: CSF's source host is DNS-blocked in the
+      current sandbox and firewalld needs dbus/systemd; both are fixture-validated
+      and run on the target-distro VPS (CSF works once `download.configserver.com` resolves).
 - [ ] poll-ci green on the CI VPS (gitleaks/hadolint/trivy run there) — pending the CI image build.
-- [ ] Real-service e2e for the IDS backends (fail2ban/CrowdSec/CSF/APF/denyhosts/sshguard)
-      on a systemd VPS across the target distros — parsers are validated against captured
-      real tool output (golden fixtures); the live daemon path is the last mile.
 - [ ] Follow-ups: foreign-enforcement scan to populate AlsoSeenIn; reboot
       persistence for raw nft/iptables/ipset; TUI ban/allow input modals.
 

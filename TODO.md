@@ -51,6 +51,13 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] install script; release workflow; systemd unit; full docs
 - [ ] tag v1.0.0 after poll-ci on the CI VPS + live per-distro e2e
 
-## M7 — Roadmap
+## M7 — Live container e2e for all backends  (done)
+- [x] `test/e2e/` suite + `make e2e`: real-tool e2e in privileged containers
+- [x] live: nftables, iptables, ipset, blackhole, hosts, ufw, sshguard, denyhosts, apf, fail2ban (daemon), crowdsec (LAPI)
+- [x] bugs found+fixed live: unban-domain DNS, apf `-u` file cleanup, crowdsec alert-wrapped JSON parser
+- [ ] csf/firewalld live: env-blocked here (configserver DNS / dbus); fixture-validated, run on VPS
+
+## Roadmap (post-1.0)
 - [ ] Wazuh/OSSEC active-response; Shorewall; FireHOL/update-ipsets; pve-firewall
 - [ ] CrowdSec `pkg/apiclient`; threat-feed import; auto-expiry daemon
+- [ ] foreign-enforcement scan for AlsoSeenIn; reboot persistence for raw nft/iptables/ipset; TUI ban/allow modals

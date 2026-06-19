@@ -100,9 +100,7 @@ func (b *Backend) Ban(ctx context.Context, req model.ActionRequest) (model.Resul
 		res.Message = "dry-run: not executed"
 		return res, nil
 	}
-	if err := b.stopService(ctx); err != nil {
-		return res, err
-	}
+	b.stopService(ctx)
 	if err := appendLine(b.hostsDeny, denyLine); err != nil {
 		return res, err
 	}
@@ -112,9 +110,7 @@ func (b *Backend) Ban(ctx context.Context, req model.ActionRequest) (model.Resul
 	if err := appendLine(b.workFile("hosts-restricted"), req.Value); err != nil {
 		return res, err
 	}
-	if err := b.startService(ctx); err != nil {
-		return res, err
-	}
+	b.startService(ctx)
 	res.Changed = true
 	return res, nil
 }
@@ -134,17 +130,13 @@ func (b *Backend) Unban(ctx context.Context, e model.Entry, dryRun bool) (model.
 		res.Message = "dry-run: not executed"
 		return res, nil
 	}
-	if err := b.stopService(ctx); err != nil {
-		return res, err
-	}
+	b.stopService(ctx)
 	for _, path := range []string{b.hostsDeny, b.workFile("hosts"), b.workFile("hosts-restricted")} {
 		if err := removeLines(path, e.Value); err != nil {
 			return res, err
 		}
 	}
-	if err := b.startService(ctx); err != nil {
-		return res, err
-	}
+	b.startService(ctx)
 	res.Changed = true
 	return res, nil
 }
@@ -195,18 +187,16 @@ func (b *Backend) workFile(name string) string {
 	return b.workDir + "/" + name
 }
 
-func (b *Backend) stopService(ctx context.Context) error {
-	if _, err := b.r.Run(ctx, "systemctl", "stop", b.service); err != nil {
-		return fmt.Errorf("systemctl stop %s: %w", b.service, err)
-	}
-	return nil
+// stopService best-effort-stops the daemon so it does not rewrite our edits.
+// Failures (no systemd, init.d-managed, or an inactive service) are non-fatal:
+// we proceed with the file edits regardless.
+func (b *Backend) stopService(ctx context.Context) {
+	_, _ = b.r.Run(ctx, "systemctl", "stop", b.service)
 }
 
-func (b *Backend) startService(ctx context.Context) error {
-	if _, err := b.r.Run(ctx, "systemctl", "start", b.service); err != nil {
-		return fmt.Errorf("systemctl start %s: %w", b.service, err)
-	}
-	return nil
+// startService best-effort-restarts the daemon after the edits.
+func (b *Backend) startService(ctx context.Context) {
+	_, _ = b.r.Run(ctx, "systemctl", "start", b.service)
 }
 
 // readLines returns the file split into lines. A missing file is not an error:

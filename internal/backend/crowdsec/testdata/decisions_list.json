@@ -1,6 +1,26 @@
 [
-  {"id": 4, "origin": "crowdsec", "type": "ban", "scope": "Ip", "value": "1.2.3.4", "duration": "3h59m12s", "scenario": "crowdsecurity/ssh-bf"},
-  {"id": 5, "origin": "cscli", "type": "ban", "scope": "Range", "value": "10.0.0.0/24", "duration": "23h0m0s", "scenario": "manual 'ban' from 'localhost'"},
-  {"id": 6, "origin": "lists", "type": "ban", "scope": "Ip", "value": "2001:db8::1", "duration": "167h0m0s", "scenario": "crowdsecurity/http-probing"},
-  {"id": 7, "origin": "crowdsec", "type": "captcha", "scope": "Ip", "value": "9.9.9.9", "duration": "1h0m0s", "scenario": "crowdsecurity/http-crawl"}
+  {
+    "id": 1,
+    "scenario": "crowdsecurity/ssh-bf",
+    "created_at": "2026-06-19T12:50:20Z",
+    "source": { "scope": "Ip", "value": "1.2.3.4" },
+    "decisions": [
+      { "id": 4, "origin": "crowdsec", "type": "ban", "scope": "Ip", "value": "1.2.3.4", "duration": "3h59m12s", "scenario": "crowdsecurity/ssh-bf" }
+    ]
+  },
+  {
+    "id": 2,
+    "scenario": "manual 'ban' from 'localhost'",
+    "decisions": [
+      { "id": 5, "origin": "cscli", "type": "ban", "scope": "Range", "value": "10.0.0.0/24", "duration": "23h0m0s", "scenario": "manual 'ban' from 'localhost'" }
+    ]
+  },
+  {
+    "id": 3,
+    "scenario": "crowdsecurity/http-probing",
+    "decisions": [
+      { "id": 6, "origin": "lists", "type": "ban", "scope": "Ip", "value": "2001:db8::1", "duration": "167h0m0s", "scenario": "crowdsecurity/http-probing" },
+      { "id": 7, "origin": "crowdsec", "type": "captcha", "scope": "Ip", "value": "9.9.9.9", "duration": "1h0m0s", "scenario": "crowdsecurity/http-crawl" }
+    ]
+  }
 ]

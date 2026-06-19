@@ -7,7 +7,9 @@ package apf
 
 import (
 	"context"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/extremeshok/omniban/internal/exec"
@@ -147,12 +149,48 @@ func TestUnbanDryRun(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	want := "apf -u 5.6.7.8"
-	if len(res.Commands) != 1 || res.Commands[0] != want {
-		t.Fatalf("commands = %v, want %q", res.Commands, want)
+	// File removal is authoritative; "apf -u" is a best-effort live-rule drop.
+	if len(res.Commands) != 2 ||
+		!strings.HasPrefix(res.Commands[0], `remove lines matching "5.6.7.8"`) ||
+		res.Commands[1] != "apf -u 5.6.7.8" {
+		t.Fatalf("commands = %v", res.Commands)
 	}
 	if len(f.Calls) != 0 {
 		t.Fatalf("dry-run must not invoke the runner: %v", f.Calls)
+	}
+}
+
+// TestUnbanRemovesFromFile is the regression for the bug a live APF run found:
+// "apf -u" does not clean deny_hosts.rules, so omniban must remove the lines
+// itself — both the bare rule line and APF's "# added ..." comment line.
+func TestUnbanRemovesFromFile(t *testing.T) {
+	dir := t.TempDir()
+	deny := filepath.Join(dir, "deny_hosts.rules")
+	body := "# added 203.0.113.20 on 06/19/26 with comment: omniban: manual\n" +
+		"203.0.113.20\n" +
+		"198.51.100.7\n"
+	if err := os.WriteFile(deny, []byte(body), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	b := New(exec.NewFake())
+	b.denyFile = deny
+
+	res, err := b.Unban(context.Background(), model.Entry{Value: "203.0.113.20"}, false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !res.Changed {
+		t.Fatal("unban should report a change")
+	}
+	data, _ := os.ReadFile(deny)
+	if strings.Contains(string(data), "203.0.113.20") {
+		t.Fatalf("entry (and its comment line) not removed:\n%s", data)
+	}
+	if !strings.Contains(string(data), "198.51.100.7") {
+		t.Fatalf("unrelated entry must remain:\n%s", data)
+	}
+	if _, err := os.Stat(deny + ".omniban.bak"); err != nil {
+		t.Fatalf("backup not created: %v", err)
 	}
 }
 

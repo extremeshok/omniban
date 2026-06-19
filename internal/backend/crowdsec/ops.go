@@ -20,7 +20,7 @@ import (
 // allowlistName is the dedicated CrowdSec allowlist omniban manages (1.6.6+).
 const allowlistName = "omniban"
 
-// cscliDecision mirrors the fields of `cscli decisions list -o json`.
+// cscliDecision mirrors a single decision in `cscli decisions list -o json`.
 type cscliDecision struct {
 	ID       int64  `json:"id"`
 	Origin   string `json:"origin"`
@@ -29,6 +29,15 @@ type cscliDecision struct {
 	Value    string `json:"value"`
 	Duration string `json:"duration"`
 	Scenario string `json:"scenario"`
+}
+
+// cscliAlert is the top-level element of `cscli decisions list -o json`: modern
+// cscli (1.7.x) wraps decisions inside alert objects (the nested "decisions"
+// array). The embedded cscliDecision also captures the older flat schema, where
+// each top-level element *is* a decision.
+type cscliAlert struct {
+	Decisions []cscliDecision `json:"decisions"`
+	cscliDecision
 }
 
 // ListBans returns active CrowdSec ban decisions.
@@ -42,12 +51,22 @@ func (b *Backend) ListBans(ctx context.Context) ([]model.Entry, error) {
 
 func parseDecisions(data []byte, now time.Time) ([]model.Entry, error) {
 	trimmed := strings.TrimSpace(string(data))
-	if trimmed == "" || trimmed == "null" {
+	if trimmed == "" || trimmed == "null" || trimmed == "[]" {
 		return nil, nil
 	}
-	var ds []cscliDecision
-	if err := json.Unmarshal([]byte(trimmed), &ds); err != nil {
+	var alerts []cscliAlert
+	if err := json.Unmarshal([]byte(trimmed), &alerts); err != nil {
 		return nil, fmt.Errorf("parse cscli decisions json: %w", err)
+	}
+	// Flatten: modern cscli nests decisions inside alerts; the older flat schema
+	// puts the decision fields on the top-level element itself.
+	var ds []cscliDecision
+	for _, a := range alerts {
+		if len(a.Decisions) > 0 {
+			ds = append(ds, a.Decisions...)
+		} else if a.Value != "" {
+			ds = append(ds, a.cscliDecision)
+		}
 	}
 	out := make([]model.Entry, 0, len(ds))
 	for _, d := range ds {

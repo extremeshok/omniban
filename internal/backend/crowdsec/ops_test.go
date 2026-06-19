@@ -53,6 +53,19 @@ func TestParseDecisionsFixture(t *testing.T) {
 	}
 }
 
+// TestParseDecisionsFlatSchema pins backward-compatibility with older cscli
+// versions that emit a flat array of decisions (no alert wrapper).
+func TestParseDecisionsFlatSchema(t *testing.T) {
+	flat := []byte(`[{"id":9,"origin":"cscli","type":"ban","scope":"Ip","value":"7.7.7.7","duration":"1h"}]`)
+	entries, err := parseDecisions(flat, time.Unix(1_700_000_000, 0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(entries) != 1 || entries[0].Value != "7.7.7.7" || entries[0].NativeID != "9" {
+		t.Fatalf("flat-schema parse = %+v", entries)
+	}
+}
+
 func TestListBansViaRunner(t *testing.T) {
 	f := exec.NewFake()
 	f.Set(string(fixture(t)), 0, "cscli", "decisions", "list", "-o", "json")
