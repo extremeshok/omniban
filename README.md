@@ -8,7 +8,7 @@ Linux server. It auto-detects what's installed, shows every ban tagged by its
 source and direction, and adds/removes/whitelists through the correct native
 backend — so you never fight your IDS or clobber another tool's rules.
 
-> Status: all 13 backends support read/write (list/search/unban, plus ban/allow
+> Status: all 19 backends support read/write (list/search/unban, plus ban/allow
 > where the mechanism allows), with the CLI, the interactive TUI, safety
 > (lockout guard, undo, audit, dry-run), and the CI gate in place. See
 > [`TODO.md`](TODO.md) and [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
@@ -24,12 +24,14 @@ interface and one mental model.
 
 | Layer | Backends |
 |-------|----------|
-| IDS / detection | CrowdSec, fail2ban, sshguard, CSF/LFD, APF/BFD, denyhosts |
-| Firewall / enforcement | UFW, firewalld, raw nftables, raw iptables, ipset |
+| IDS / detection | CrowdSec, fail2ban, sshguard, CSF/LFD, APF/BFD, denyhosts, Suricata, Wazuh/OSSEC |
+| Firewall / enforcement | UFW, firewalld, Shorewall, raw nftables, raw iptables, ipset |
+| Proxy / load balancer | HAProxy |
+| WAF | ModSecurity, BunkerWeb |
 | Routing / DNS | blackhole null-routes (`ip route`), `/etc/hosts` sinkholes |
 
 Targets Ubuntu, Debian, RHEL clones (AlmaLinux/Rocky), CloudLinux, and Proxmox.
-Roadmap: Wazuh/OSSEC, Shorewall, FireHOL, Proxmox pve-firewall, threat-feed import.
+Roadmap: FireHOL, Proxmox pve-firewall, threat-feed import.
 
 ## Design principles
 

@@ -103,7 +103,7 @@ func TestBanDryRun(t *testing.T) {
 	}
 	wantCmds := []string{
 		"socat - UNIX-CONNECT:/run/haproxy/admin.sock",
-		"set map /etc/haproxy/omniban_deny.map 5.6.7.8 ok",
+		"add map /etc/haproxy/omniban_deny.map 5.6.7.8 ok",
 	}
 	if len(res.Commands) != 2 || res.Commands[0] != wantCmds[0] || res.Commands[1] != wantCmds[1] {
 		t.Fatalf("commands = %v, want %v", res.Commands, wantCmds)
@@ -148,11 +148,11 @@ func TestBanExecutes(t *testing.T) {
 		t.Fatalf("runner calls = %v", f.Calls)
 	}
 	got := f.Inputs[socatKey]
-	if want := "set map /etc/haproxy/omniban_deny.map 9.9.9.9 ok\n"; got != want {
+	if want := "add map /etc/haproxy/omniban_deny.map 9.9.9.9 ok\n"; got != want {
 		t.Fatalf("stdin = %q, want %q", got, want)
 	}
 	if !strings.HasSuffix(strings.TrimSpace(got), "ok") {
-		t.Fatalf("set map command malformed: %q", got)
+		t.Fatalf("add map command malformed: %q", got)
 	}
 }
 

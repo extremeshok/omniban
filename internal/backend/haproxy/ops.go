@@ -66,10 +66,11 @@ func parseShowMap(out string) []model.Entry {
 	return entries
 }
 
-// Ban adds the IP to omniban's deny map ("set map <file> <ip> ok"). The map is
-// referenced by an ACL, so the block applies with no reload.
+// Ban adds the IP to omniban's deny map ("add map <file> <ip> ok"). The map is
+// referenced by an ACL, so the block applies with no reload. ("set map" only
+// updates an existing key; "add map" inserts a new one.)
 func (b *Backend) Ban(ctx context.Context, req model.ActionRequest) (model.Result, error) {
-	return b.mutate(ctx, req.DryRun, "ban", req.Value, "set map "+b.denyMap+" "+req.Value+" ok")
+	return b.mutate(ctx, req.DryRun, "ban", req.Value, "add map "+b.denyMap+" "+req.Value+" ok")
 }
 
 // Unban removes the IP from omniban's deny map ("del map <file> <ip>").

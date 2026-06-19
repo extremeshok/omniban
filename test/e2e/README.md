@@ -14,7 +14,7 @@ E2E_IMAGE=almalinux:9 ./test/e2e/run.sh netfilter_e2e.sh
 `run.sh` cross-builds `cmd/omniban`, then runs each `*_e2e.sh` in a fresh
 privileged container with the binary mounted at `/usr/local/bin/omniban`.
 
-## Scenarios (all 13 backends, real tools)
+## Scenarios (all 19 backends, real tools)
 
 | Scenario | Real tool exercised | Notes |
 |---|---|---|
@@ -27,6 +27,12 @@ privileged container with the binary mounted at `/usr/local/bin/omniban`.
 | `sshguard_e2e.sh` | sshguard whitelist + its nftables set | allowlist file + the `ip sshguard`/`attackers` set the daemon maintains |
 | `ufw_e2e.sh` | ufw | deny/allow + by-spec delete |
 | `firewalld_e2e.sh` | firewalld daemon (over dbus) | iptables backend (nftables backend stalls in containers); rich rules + reload |
+| `suricata_e2e.sh` | Suricata unix-command socket | `suricatasc` dataset-add/remove/lookup; ListBans parses the dataset save file (from bookworm-backports) |
+| `wazuh_e2e.sh` | Wazuh `firewall-drop` active response | stateful two-message handshake over the AR socket; verifies the iptables DROP it installs + `active-responses.log` |
+| `shorewall_e2e.sh` | Shorewall dynamic blacklist | `shorewall drop`/`allow`/`show dynamic`; needs `/var/log/messages` present |
+| `haproxy_e2e.sh` | HAProxy runtime API | `add map`/`del map`/`show map` over the stats socket via `socat` |
+| `modsecurity_e2e.sh` | nginx + ModSecurity v3 | `@ipMatchFromFile` blocklist + `nginx -s reload`; asserts a real 403 for a blocked client |
+| `bunkerweb_e2e.sh` | BunkerWeb `bwcli` | SKIPs without the full scheduler+datastore stack; adapter is unit-tested |
 
 Requires Docker with privileged containers (kernel netfilter / dbus access).
 Scenarios that install from the network print `SKIP: …` and exit cleanly if a

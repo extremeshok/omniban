@@ -57,7 +57,20 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] bugs found+fixed live: unban-domain DNS, apf `-u` file cleanup, crowdsec alert-wrapped JSON parser
 - [ ] multi-distro confirmation (AlmaLinux/CloudLinux/Proxmox) via E2E_IMAGE on the VPS
 
+## M8 — Suricata, Wazuh, Shorewall, HAProxy, ModSecurity, BunkerWeb  (done)
+- [x] proxy + WAF layers in the model; 6 new backend adapters with `Detect`/`Capabilities`
+- [x] Suricata (IPS): `suricatasc` dataset-add/remove/lookup + ListBans from the dataset save file
+- [x] Wazuh/OSSEC (HIDS): `firewall-drop` active response over its socket (stateful two-message handshake); list from `active-responses.log`
+- [x] Shorewall (firewall): dynamic blacklist via `shorewall drop`/`allow`/`show dynamic`
+- [x] HAProxy (proxy/LB): runtime API `add map`/`del map`/`show map` over the stats socket
+- [x] ModSecurity (WAF): `@ipMatchFromFile` blocklist + `nginx -s reload`
+- [x] BunkerWeb (WAF): `bwcli ban`/`unban`/`bans`
+- [x] golden-fixture unit tests for all 6; registry + manager IDS-rank wiring
+- [x] live container e2e: suricata 3/3, wazuh 5/5, shorewall 4/4, haproxy 4/4, modsecurity 6/6 (incl. real 403); bunkerweb SKIPs (needs full stack)
+- [x] bugs found+fixed live: haproxy `set map`→`add map`, wazuh two-message AR handshake
+
 ## Roadmap (post-1.0)
-- [ ] Wazuh/OSSEC active-response; Shorewall; FireHOL/update-ipsets; pve-firewall
+- [ ] FireHOL/update-ipsets; pve-firewall (Proxmox)
 - [ ] CrowdSec `pkg/apiclient`; threat-feed import; auto-expiry daemon
+- [ ] BunkerWeb live e2e on a full stack; multi-distro e2e on the VPS
 - [ ] foreign-enforcement scan for AlsoSeenIn; reboot persistence for raw nft/iptables/ipset; TUI ban/allow modals

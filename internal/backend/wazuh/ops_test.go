@@ -179,16 +179,24 @@ func TestUnbanDryRun(t *testing.T) {
 	}
 }
 
-// assertRequest verifies that stdin is the exact firewall-drop JSON request for
-// the given command and source IP.
+// assertRequest verifies that stdin carries the firewall-drop JSON request for
+// the given command and source IP, followed by the "continue" handshake message
+// (the Wazuh 4.x two-message active-response protocol).
 func assertRequest(t *testing.T, stdin, wantCmd, wantIP string) {
 	t.Helper()
 	if stdin == "" {
 		t.Fatalf("no stdin recorded for the invocation")
 	}
+	lines := strings.Split(strings.TrimRight(stdin, "\n"), "\n")
+	if len(lines) != 2 {
+		t.Fatalf("stdin should carry the request + continue (2 lines), got %d: %q", len(lines), stdin)
+	}
+	if !strings.Contains(lines[1], `"command":"continue"`) {
+		t.Fatalf("second message is not a continue handshake: %q", lines[1])
+	}
 	var req arRequest
-	if err := json.Unmarshal([]byte(stdin), &req); err != nil {
-		t.Fatalf("stdin is not valid JSON (%v): %q", err, stdin)
+	if err := json.Unmarshal([]byte(lines[0]), &req); err != nil {
+		t.Fatalf("request line is not valid JSON (%v): %q", err, lines[0])
 	}
 	if req.Version != 1 {
 		t.Errorf("version = %d, want 1", req.Version)

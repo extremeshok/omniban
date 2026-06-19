@@ -78,17 +78,32 @@ func (b *Backend) Unban(ctx context.Context, e model.Entry, dryRun bool) (model.
 // invoke builds the JSON request for the given command and either records it
 // (dry-run) or pipes it to the firewall-drop script on stdin.
 func (b *Backend) invoke(ctx context.Context, command, action, value string, dryRun bool) (model.Result, error) {
-	payload, err := buildRequest(command, value)
+	request, err := buildRequest(command, value)
 	if err != nil {
 		return model.Result{}, fmt.Errorf("wazuh: build %s request: %w", command, err)
 	}
+	// Wazuh 4.x active-response uses a stateful two-message handshake: the script
+	// reads the command, replies with a "check_keys" request, and waits for a
+	// "continue" (or "abort") before applying the firewall change. We send both
+	// messages (newline-delimited) so the buffered "continue" is read after the
+	// handshake.
+	cont, err := buildRequest("continue", value)
+	if err != nil {
+		return model.Result{}, fmt.Errorf("wazuh: build continue request: %w", err)
+	}
+	payload := make([]byte, 0, len(request)+len(cont)+2)
+	payload = append(payload, request...)
+	payload = append(payload, '\n')
+	payload = append(payload, cont...)
+	payload = append(payload, '\n')
+
 	script := b.script()
 	res := model.Result{
 		Backend: string(model.OriginWazuh),
 		Action:  action,
 		Value:   value,
 		Commands: []string{
-			fmt.Sprintf("%s <<< %s", script, string(payload)),
+			fmt.Sprintf("%s <<< %s (+continue)", script, string(request)),
 		},
 		DryRun: dryRun,
 	}
