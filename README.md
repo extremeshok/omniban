@@ -8,9 +8,10 @@ Linux server. It auto-detects what's installed, shows every ban tagged by its
 source and direction, and adds/removes/whitelists through the correct native
 backend — so you never fight your IDS or clobber another tool's rules.
 
-> Status: early development. M1 (skeleton, backend detection, `status`/`doctor`,
-> CI gate) is complete. Read/write management of each backend lands across
-> M2–M4. See [`TODO.md`](TODO.md) and [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
+> Status: all 13 backends support read/write (list/search/unban, plus ban/allow
+> where the mechanism allows), with the CLI, the interactive TUI, safety
+> (lockout guard, undo, audit, dry-run), and the CI gate in place. See
+> [`TODO.md`](TODO.md) and [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
 
 ## Why
 
@@ -61,17 +62,20 @@ make build && sudo make install
 ## Usage
 
 ```sh
-sudo omniban status            # detected backends and their state
-sudo omniban doctor            # health check + warnings
-sudo omniban list              # every ban/allow, source- and direction-labeled   (M2)
-sudo omniban check 1.2.3.4 --contains   # is this blocked anywhere?               (M2)
-sudo omniban ban evil.example.com --duration 4h                                   # (M2)
-sudo omniban unban 1.2.3.4 --via denyhosts                                        # (M2)
-sudo omniban sinkhole ads.example.com                                             # (M4)
-sudo omniban null-route 203.0.113.0/24                                            # (M4)
+sudo omniban status                       # detected backends and their state
+sudo omniban doctor                       # health check + warnings
+sudo omniban list                         # every ban/allow, source- and direction-labeled
+sudo omniban check 1.2.3.4 --contains     # is this blocked anywhere? (incl. covering CIDRs)
+sudo omniban ban evil.example.com --duration 4h   # resolves the host, bans each address
+sudo omniban unban 1.2.3.4 --via denyhosts
+sudo omniban sinkhole ads.example.com     # /etc/hosts domain null-route (outbound)
+sudo omniban null-route 203.0.113.0/24    # blackhole route (both directions)
+sudo omniban undo                         # roll back the last mutating action
 ```
 
-Run `sudo omniban` with no arguments for the interactive TUI (M5).
+Run `sudo omniban` with no arguments (on a terminal) for the interactive TUI,
+or `sudo omniban tui`. Add `--dry-run` to any mutating command to preview the
+exact native command(s) without executing.
 
 ## Development
 

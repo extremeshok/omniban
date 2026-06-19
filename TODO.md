@@ -46,9 +46,10 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] `tui` command + interactive launch on no-subcommand
 - [ ] follow-up: ban/allow input modals in the TUI (CLI covers these today)
 
-## M6 — Packaging/release/docs
-- [ ] goreleaser + nfpm (.deb/.rpm); install script; release workflow
-- [ ] full docs; tag v1.0.0; e2e on VPS
+## M6 — Packaging/release/docs  (done, pending VPS validation)
+- [x] goreleaser + nfpm: static amd64/arm64 binaries + .deb/.rpm + checksums (snapshot verified)
+- [x] install script; release workflow; systemd unit; full docs
+- [ ] tag v1.0.0 after poll-ci on the CI VPS + live per-distro e2e
 
 ## M7 — Roadmap
 - [ ] Wazuh/OSSEC active-response; Shorewall; FireHOL/update-ipsets; pve-firewall

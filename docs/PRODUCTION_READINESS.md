@@ -2,31 +2,39 @@
 
 ## v1.0.0 Definition of Done
 
-- [ ] All v1 backends detected and **fully read/write** (list + search + unban
-      everywhere; ban/allow per capability):
-      CrowdSec, fail2ban, sshguard, CSF/LFD, APF/BFD, denyhosts, UFW, firewalld,
-      raw nftables, raw iptables, ipset, blackhole routes, `/etc/hosts` sinkhole.
-- [ ] Unified list with source + direction labels, dedup/attribution, and
-      foreign-namespace safety.
-- [ ] `check` search: exact, CIDR-contains, wildcard/glob, hostname.
-- [ ] Add by IP / CIDR / hostname / domain; `sinkhole` and `null-route` with boot
-      persistence.
-- [ ] Safety: lockout guard, undo journal, audit trail, dry-run, file backups.
-- [ ] TUI + full CLI; `doctor`/`status` health and warnings.
-- [ ] `AGENTS.md` honored (no AI attribution, no emoji).
-- [ ] All `poll-ci` checks green + trivy clean; packaging (.deb/.rpm + installer);
-      docs; e2e verified on the VPS.
+- [x] All 13 backends detected and **read/write** (list + search + unban
+      everywhere; ban/allow per capability): CrowdSec, fail2ban, sshguard,
+      CSF/LFD, APF/BFD, denyhosts, UFW, firewalld, raw nftables, raw iptables,
+      ipset, blackhole routes, `/etc/hosts` sinkhole.
+- [x] Unified list with source + direction labels, dedup/attribution, and
+      owned-namespace safety (omniban never writes foreign objects).
+- [x] `check` search: exact, CIDR-contains, wildcard/glob, hostname.
+- [x] Add by IP / CIDR / hostname / domain; `sinkhole` and `null-route` with
+      boot persistence (`apply-routes` + systemd oneshot).
+- [x] Safety: lockout guard, undo journal, audit trail, dry-run, file backups.
+- [x] TUI + full CLI; `doctor`/`status` health and warnings.
+- [x] `AGENTS.md` honored (no AI attribution, no emoji).
+- [x] Packaging: goreleaser builds static amd64/arm64 binaries + `.deb`/`.rpm` +
+      checksums (snapshot verified); install script; systemd unit.
+- [x] Local gate green: gofmt, `go build`, `go vet`, `golangci-lint` (0 issues),
+      `go test -race`, coverage (~60%).
+- [ ] poll-ci green on the CI VPS (gitleaks/hadolint/trivy run there) — pending the CI image build.
+- [ ] Live e2e on the provided VPS across the target distros.
+- [ ] Follow-ups: foreign-enforcement scan to populate AlsoSeenIn; reboot
+      persistence for raw nft/iptables/ipset; TUI ban/allow input modals.
 
 ## Current state
 
-**M1 complete:** module skeleton, version stamping, signal handling; foundational
-packages (`model`, `exec`, `validate`, `config`, `logging`, `audit`); the backend
-interface plus 13 adapters implementing `Detect`/`Capabilities`; the registry and
-`manager` (detection, cross-warnings, manual-target selection); CLI `status`,
-`doctor`, `version`, `init`; hermetic unit tests; and a green local gate (build,
-vet, golangci-lint, `go test -race`, coverage).
+**M1–M6 implemented locally and green.** Foundation (`model`, `exec`,
+`validate`, `config`, `logging`, `audit`, `resolve`, `safety`); the backend
+interface + 13 read/write adapters with golden fixtures; the `manager`
+(detection, dedup/attribution, action routing, audit, undo, lockout guard); the
+full CLI (`status`/`doctor`/`list`/`check`/`ban`/`unban`/`allow`/`unallow`/
+`sinkhole`/`null-route`/`apply-routes`/`undo`/`init`/`version`); the Bubble Tea
+TUI; and the goreleaser/nfpm release pipeline.
 
-Read/write management of each backend lands in M2–M4. See `TODO.md`.
+Remaining before tagging v1.0.0: run the poll-ci gate on the CI VPS and the live
+per-distro e2e (the maintainer is providing a VPS). See `TODO.md` for follow-ups.
 
 ## Architecture
 
