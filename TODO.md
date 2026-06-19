@@ -41,8 +41,10 @@ Milestones ship at production quality (tests, lint, security scan, docs). See
 - [x] `/etc/hosts` sinkhole: whole-file scan (managed vs External), managed-block adds, surgical remove, backups
 - [x] `sinkhole` / `null-route` CLI; Direction surfaced in list/check
 
-## M5 — TUI
-- [ ] bubbletea bans/allowlist/status views; search & action modals; filter/sort; async refresh
+## M5 — TUI  (done)
+- [x] bubbletea bans/allowlist/status views; filter; async refresh; unban confirm modal
+- [x] `tui` command + interactive launch on no-subcommand
+- [ ] follow-up: ban/allow input modals in the TUI (CLI covers these today)
 
 ## M6 — Packaging/release/docs
 - [ ] goreleaser + nfpm (.deb/.rpm); install script; release workflow

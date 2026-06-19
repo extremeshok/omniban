@@ -18,6 +18,7 @@ import (
 	"github.com/extremeshok/omniban/internal/exec"
 	"github.com/extremeshok/omniban/internal/logging"
 	"github.com/extremeshok/omniban/internal/manager"
+	"github.com/extremeshok/omniban/internal/tui"
 )
 
 // app holds shared state and parsed global flags for the command tree.
@@ -53,9 +54,12 @@ func (a *app) rootCmd() *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			// No subcommand: a full-screen TUI lands in M5. For now, show help.
+			// No subcommand: launch the TUI on an interactive terminal, else help.
 			if isInteractive() {
-				fmt.Fprintln(a.out, "omniban: the interactive TUI arrives in a later milestone — showing help for now.")
+				if err := requireRoot(); err != nil {
+					return err
+				}
+				return tui.Run(cmd.Context(), a.mgr)
 			}
 			return cmd.Help()
 		},
@@ -72,6 +76,7 @@ func (a *app) rootCmd() *cobra.Command {
 	pf.StringVar(&a.flagLogLevel, "log-level", "", "log level: debug|info|warn|error")
 
 	root.AddCommand(
+		a.tuiCmd(),
 		a.statusCmd(),
 		a.doctorCmd(),
 		a.versionCmd(),
@@ -104,6 +109,20 @@ func (a *app) preRun(_ *cobra.Command, _ []string) error {
 	_ = logging.Setup(os.Stderr, cfg.LogLevel, a.flagJSON)
 	a.mgr = manager.New(cfg, a.runner)
 	return nil
+}
+
+func (a *app) tuiCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "tui",
+		Short: "Launch the interactive terminal UI",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			if err := requireRoot(); err != nil {
+				return err
+			}
+			return tui.Run(cmd.Context(), a.mgr)
+		},
+	}
 }
 
 // requireRoot returns an error unless the process is running as root. Most
