@@ -1,0 +1,57 @@
+# poll-ci gate for omniban, run by extremeshok/poll-ci on the CI VPS.
+#
+# poll-ci watches master, runs these checks in a fresh container of `image`
+# (repo at /repo, no Docker socket, commands under POSIX `sh -ec`), reports
+# commit statuses, and on green fast-forwards `release` (see `promote:`).
+#
+# image: a toolchain container with these tools on PATH — go 1.26, git,
+#   golangci-lint, gosec, govulncheck, shellcheck, gitleaks, hadolint.
+#   Build it from ci/Dockerfile and publish where the CI VPS can reach it.
+image: ghcr.io/extremeshok/omniban-ci:latest
+
+checks:
+  - name: build
+    run: CGO_ENABLED=0 go build ./...
+    timeout: 300
+
+  - name: vet
+    run: go vet ./...
+    timeout: 300
+
+  - name: lint
+    run: golangci-lint run ./...
+    timeout: 600
+
+  - name: unit-tests
+    run: go test -race ./...
+    timeout: 1200
+
+  - name: coverage
+    run: make coverage-check
+    timeout: 1200
+
+  - name: security
+    run: gosec -severity high -confidence high ./cmd/... ./internal/... && govulncheck ./...
+    timeout: 1800
+
+  - name: shell-lint
+    run: git ls-files -z -- '*.sh' | xargs -0 -r shellcheck --severity=error --external-sources
+    timeout: 300
+
+  - name: secret-scan
+    run: gitleaks detect --no-git --source . --redact --no-banner
+    timeout: 300
+
+  - name: dockerfile-lint
+    run: hadolint --failure-threshold error Dockerfile
+    timeout: 120
+
+# Built-in dependency CVE scan; a fixable HIGH/CRITICAL fails the gate.
+scan:
+  scanners: vuln
+  severity: HIGH,CRITICAL
+  timeout: 600
+
+# On green of master, fast-forward `release` to the tested commit.
+promote:
+  branch: release

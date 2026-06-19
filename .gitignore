@@ -1,0 +1,9 @@
+# Build artifacts
+/bin/
+/dist/
+coverage.out
+coverage.html
+
+# Editor / OS cruft
+*.swp
+.DS_Store

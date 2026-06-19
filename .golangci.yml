@@ -1,0 +1,72 @@
+# omniban — golangci-lint configuration (schema v2).
+# Coded by Adrian Jon Kriel :: admin@extremeshok.com
+version: "2"
+
+run:
+  timeout: 5m
+
+linters:
+  # The "standard" set (errcheck, govet, ineffassign, staticcheck, unused) plus:
+  default: standard
+  enable:
+    - revive
+    - misspell
+    - unconvert
+    - bodyclose
+    - errorlint
+  settings:
+    errcheck:
+      # Writes to stdout/stderr (CLI output) are not worth error-checking.
+      exclude-functions:
+        - fmt.Fprint
+        - fmt.Fprintf
+        - fmt.Fprintln
+    revive:
+      rules:
+        - name: blank-imports
+        - name: context-as-argument
+        - name: context-keys-type
+        - name: dot-imports
+        - name: error-return
+        - name: error-strings
+        - name: error-naming
+        - name: exported
+        - name: increment-decrement
+        - name: indent-error-flow
+        - name: package-comments
+        - name: range
+        - name: receiver-naming
+        - name: redefines-builtin-id
+        - name: superfluous-else
+        - name: time-naming
+        - name: unexported-return
+        - name: unreachable-code
+        - name: unused-parameter
+        - name: var-declaration
+        - name: var-naming
+          # Teach the naming rule our domain initialisms (IDS/IPS) so e.g.
+          # LayerIDS and activeIDS are accepted as-is.
+          arguments:
+            - ["IDS", "IPS"]
+            - []
+    staticcheck:
+      # ST1003 (naming) would also reject the IDS initialism; revive owns naming.
+      checks:
+        - all
+        - -ST1003
+  exclusions:
+    rules:
+      # Test files may ignore errors and use weaker constructs freely.
+      - path: _test\.go
+        linters:
+          - errcheck
+          - bodyclose
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/extremeshok/omniban

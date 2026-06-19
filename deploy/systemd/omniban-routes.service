@@ -1,0 +1,15 @@
+# omniban — replay persisted blackhole (null-route) entries at boot.
+# Installed by the .deb/.rpm package. Enable with:
+#   systemctl enable omniban-routes.service
+[Unit]
+Description=omniban blackhole route replay
+After=network-pre.target
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/omniban apply-routes
+
+[Install]
+WantedBy=multi-user.target

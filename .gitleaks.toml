@@ -1,0 +1,6 @@
+# omniban — gitleaks configuration.
+# Coded by Adrian Jon Kriel :: admin@extremeshok.com
+title = "omniban gitleaks config"
+
+[extend]
+useDefault = true

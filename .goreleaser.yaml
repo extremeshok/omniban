@@ -1,0 +1,56 @@
+# omniban — goreleaser configuration (schema v2).
+# Coded by Adrian Jon Kriel :: admin@extremeshok.com
+version: 2
+
+project_name: omniban
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: omniban
+    main: ./cmd/omniban
+    binary: omniban
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{ .Version }}
+
+archives:
+  - id: omniban
+    formats:
+      - tar.gz
+    files:
+      - LICENSE
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+
+nfpms:
+  - id: omniban
+    package_name: omniban
+    homepage: https://github.com/extremeshok/omniban
+    maintainer: Adrian Jon Kriel <admin@extremeshok.com>
+    description: One ban manager for every Linux firewall & IDS.
+    license: BSD-3-Clause
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    contents:
+      - src: deploy/systemd/omniban-routes.service
+        dst: /usr/lib/systemd/system/omniban-routes.service
+
+release:
+  github:
+    owner: extremeshok
+    name: omniban
