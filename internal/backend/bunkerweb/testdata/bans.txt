@@ -1,0 +1,24 @@
+
+[1m[44m[37m BunkerWeb Ban List [0m
+
+[34m▓▓▓ [1mlocal Bans [0m[34m ▓▓▓[0m
+[34m────────────────────────────────────────────────────────────[0m
+[32m[1m🌐 Global Bans:[0m
+  🔒 [1m[37m203.0.113.45[0m [US]
+     ⏱ Banned on [37m2026-06-18 at 14:22:01[0m for [36m1 day and 2 hours[0m
+     ℹ️ Reason: bad behavior
+  [34m· · · · · · · · · · · · · · · · · · · · · · ·[0m
+  🔒 [1m[37m2001:db8::dead:beef[0m [unknown]
+     ⏱ Banned on [37m2026-06-10 at 09:00:00[0m [31mpermanent[0m
+     ℹ️ Reason: manual
+[34m────────────────────────────────────────────────────────────[0m
+[32m[1m🗧 Service-Specific Bans:[0m
+  🔒 [1m[37m198.51.100.7[0m [DE] - [33mService:[0m www.example.com
+     ⏱ Banned on [37m2026-06-19 at 11:05:30[0m for [36m30 minutes and 15 seconds[0m
+     ℹ️ Reason: antibot challenge failed
+[34m────────────────────────────────────────────────────────────[0m
+
+[34m▓▓▓ [1mredis Bans [0m[34m ▓▓▓[0m
+[34m────────────────────────────────────────────────────────────[0m
+[33mℹ️ No bans found[0m
+[34m────────────────────────────────────────────────────────────[0m

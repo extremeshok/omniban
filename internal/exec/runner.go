@@ -36,6 +36,9 @@ type Runner interface {
 	// Run executes name with args and returns the captured result. A non-zero
 	// exit returns a non-nil error along with a populated Result.
 	Run(ctx context.Context, name string, args ...string) (Result, error)
+	// RunInput is Run with data written to the command's stdin (for tools that
+	// read a request on stdin, e.g. socat to a socket, or Wazuh's AR scripts).
+	RunInput(ctx context.Context, stdin []byte, name string, args ...string) (Result, error)
 	// LookPath reports whether name is resolvable on PATH.
 	LookPath(name string) (string, error)
 }
@@ -52,8 +55,16 @@ func New() *OSRunner { return &OSRunner{} }
 // Run executes the command with a C locale, inheriting the parent environment
 // minus any locale variables (which are forced to C for deterministic parsing).
 func (r *OSRunner) Run(ctx context.Context, name string, args ...string) (Result, error) {
+	return r.RunInput(ctx, nil, name, args...)
+}
+
+// RunInput is Run with stdin fed from the given bytes.
+func (r *OSRunner) RunInput(ctx context.Context, stdin []byte, name string, args ...string) (Result, error) {
 	cmd := exec.CommandContext(ctx, name, args...)
 	cmd.Env = cLocaleEnv(r.ExtraEnv)
+	if len(stdin) > 0 {
+		cmd.Stdin = bytes.NewReader(stdin)
+	}
 
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -107,12 +118,15 @@ type FakeResponse struct {
 // register golden output and assert on the recorded Calls.
 type FakeRunner struct {
 	Responses map[string]FakeResponse
-	Missing   []string // PATH entries that should be reported absent by LookPath
-	Calls     []string
+	Missing   []string          // PATH entries that should be reported absent by LookPath
+	Calls     []string          // invocation keys, in order
+	Inputs    map[string]string // last stdin seen per invocation key (from RunInput)
 }
 
 // NewFake returns an empty FakeRunner.
-func NewFake() *FakeRunner { return &FakeRunner{Responses: map[string]FakeResponse{}} }
+func NewFake() *FakeRunner {
+	return &FakeRunner{Responses: map[string]FakeResponse{}, Inputs: map[string]string{}}
+}
 
 // Set registers a response for a command invocation.
 func (f *FakeRunner) Set(stdout string, exitCode int, name string, args ...string) {
@@ -136,6 +150,15 @@ func (f *FakeRunner) Run(_ context.Context, name string, args ...string) (Result
 		return res, fmt.Errorf("fakerunner: %q exited %d", k, resp.ExitCode)
 	}
 	return res, nil
+}
+
+// RunInput records the stdin under the invocation key, then behaves like Run.
+func (f *FakeRunner) RunInput(ctx context.Context, stdin []byte, name string, args ...string) (Result, error) {
+	if f.Inputs == nil {
+		f.Inputs = map[string]string{}
+	}
+	f.Inputs[Key(name, args)] = string(stdin)
+	return f.Run(ctx, name, args...)
 }
 
 // LookPath reports name as present unless it was registered in Missing.

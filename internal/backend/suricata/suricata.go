@@ -19,14 +19,20 @@ import (
 // Backend is the Suricata adapter.
 type Backend struct {
 	backend.Unimplemented
-	r      exec.Runner
-	socket string // suricata command socket
-	set    string // omniban-owned dataset name
+	r         exec.Runner
+	socket    string // suricata command socket
+	set       string // omniban-owned dataset name
+	stateFile string // dataset save/state file, read best-effort for ListBans
 }
 
 // New constructs a Suricata adapter.
 func New(r exec.Runner) *Backend {
-	return &Backend{r: r, socket: "/var/run/suricata/command.socket", set: "omniban-deny"}
+	return &Backend{
+		r:         r,
+		socket:    "/var/run/suricata/command.socket",
+		set:       "omniban-deny",
+		stateFile: "/var/lib/suricata/data/omniban-deny.lst",
+	}
 }
 
 // Name returns the backend identifier.

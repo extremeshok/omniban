@@ -35,8 +35,8 @@ func (b *Backend) Capabilities() backend.Capabilities {
 		Scopes:         []model.Scope{model.ScopeIP, model.ScopeRange},
 		CanBan:         true,
 		CanUnban:       true,
-		CanAllow:       true,
-		CanRemoveAllow: true,
+		CanAllow:       false,
+		CanRemoveAllow: false,
 		SupportsCIDR:   true,
 		SupportsIPv6:   true,
 	}

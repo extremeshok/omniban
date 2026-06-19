@@ -9,11 +9,16 @@ package bunkerweb
 
 import (
 	"context"
+	"errors"
 
 	"github.com/extremeshok/omniban/internal/backend"
 	"github.com/extremeshok/omniban/internal/exec"
 	"github.com/extremeshok/omniban/internal/model"
 )
+
+// errNoBinary is returned by read/write operations when the bwcli CLI cannot
+// be located on the host.
+var errNoBinary = errors.New("bunkerweb: binary not found (looked for bwcli, /usr/bin/bwcli, /usr/sbin/bwcli)")
 
 // Backend is the BunkerWeb adapter.
 type Backend struct {
@@ -35,8 +40,8 @@ func (b *Backend) Capabilities() backend.Capabilities {
 		Scopes:         []model.Scope{model.ScopeIP},
 		CanBan:         true,
 		CanUnban:       true,
-		CanAllow:       true,
-		CanRemoveAllow: true,
+		CanAllow:       false, // bwcli has no allowlist subcommand
+		CanRemoveAllow: false, // bwcli has no allowlist subcommand
 		SupportsIPv6:   true,
 		SupportsExpiry: true,
 	}

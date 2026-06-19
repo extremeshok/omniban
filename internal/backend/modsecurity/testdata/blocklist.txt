@@ -1,0 +1,8 @@
+# omniban-managed ModSecurity @ipMatchFromFile blocklist
+# one IP or CIDR per line; blank and comment lines are ignored
+
+203.0.113.7
+198.51.100.0/24
+2001:db8:dead:beef::1
+2001:db8:abcd::/48
+192.0.2.44   # noisy scanner
