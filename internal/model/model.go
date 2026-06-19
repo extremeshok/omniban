@@ -16,21 +16,27 @@ type Origin string
 
 // Known backend origins.
 const (
-	OriginManual    Origin = "manual"
-	OriginFail2ban  Origin = "fail2ban"
-	OriginCrowdSec  Origin = "crowdsec"
-	OriginSSHGuard  Origin = "sshguard"
-	OriginCSF       Origin = "csf"
-	OriginAPF       Origin = "apf"
-	OriginBFD       Origin = "bfd"
-	OriginDenyHosts Origin = "denyhosts"
-	OriginUFW       Origin = "ufw"
-	OriginFirewalld Origin = "firewalld"
-	OriginNftables  Origin = "nftables"
-	OriginIptables  Origin = "iptables"
-	OriginIPSet     Origin = "ipset"
-	OriginBlackhole Origin = "blackhole"
-	OriginHosts     Origin = "hosts"
+	OriginManual      Origin = "manual"
+	OriginFail2ban    Origin = "fail2ban"
+	OriginCrowdSec    Origin = "crowdsec"
+	OriginSSHGuard    Origin = "sshguard"
+	OriginCSF         Origin = "csf"
+	OriginAPF         Origin = "apf"
+	OriginBFD         Origin = "bfd"
+	OriginDenyHosts   Origin = "denyhosts"
+	OriginSuricata    Origin = "suricata"
+	OriginWazuh       Origin = "wazuh"
+	OriginUFW         Origin = "ufw"
+	OriginFirewalld   Origin = "firewalld"
+	OriginShorewall   Origin = "shorewall"
+	OriginNftables    Origin = "nftables"
+	OriginIptables    Origin = "iptables"
+	OriginIPSet       Origin = "ipset"
+	OriginHAProxy     Origin = "haproxy"
+	OriginBunkerWeb   Origin = "bunkerweb"
+	OriginModSecurity Origin = "modsecurity"
+	OriginBlackhole   Origin = "blackhole"
+	OriginHosts       Origin = "hosts"
 )
 
 // Family distinguishes IPv4, IPv6, and domain-name entries.
@@ -69,8 +75,10 @@ type Layer string
 
 // Backend layers.
 const (
-	LayerIDS      Layer = "ids"      // detects + creates bans (fail2ban, crowdsec, ...)
-	LayerFirewall Layer = "firewall" // drops packets (ufw, firewalld, nft, ...)
+	LayerIDS      Layer = "ids"      // detects + creates bans (fail2ban, crowdsec, suricata, wazuh, ...)
+	LayerFirewall Layer = "firewall" // drops packets (ufw, firewalld, nft, shorewall, ...)
+	LayerProxy    Layer = "proxy"    // load balancer / reverse proxy (haproxy)
+	LayerWAF      Layer = "waf"      // web application firewall (bunkerweb, modsecurity)
 	LayerRouting  Layer = "routing"  // blackhole routes
 	LayerDNS      Layer = "dns"      // /etc/hosts sinkhole
 )

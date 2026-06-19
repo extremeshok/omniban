@@ -380,7 +380,8 @@ func dedup(entries []model.Entry) []model.Entry {
 func rankOf(o model.Origin) int {
 	switch o {
 	case model.OriginFail2ban, model.OriginCrowdSec, model.OriginSSHGuard,
-		model.OriginDenyHosts, model.OriginCSF, model.OriginAPF, model.OriginBFD:
+		model.OriginDenyHosts, model.OriginCSF, model.OriginAPF, model.OriginBFD,
+		model.OriginSuricata, model.OriginWazuh:
 		return 0 // IDS / detection owners
 	case model.OriginBlackhole:
 		return 2 // routing
